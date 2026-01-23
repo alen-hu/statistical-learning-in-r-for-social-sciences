@@ -271,6 +271,187 @@ adult\ income = f(educational\ credentials,\ occupation,\ geographic\ region,\ p
 <p><strong>Neural networks</strong> and <strong>deep learning</strong> represent the extreme of flexibility. These methods can approximate virtually any function given enough data and computational resources. They have achieved remarkable success in applications such as image recognition, natural language processing, and game playing. However, their complexity makes them essentially uninterpretable. A deep neural network with millions of parameters cannot be summarized in a way that humans can understand. These methods are purely predictive tools, unsuitable for inference, and they require very large datasets to train effectively without overfitting.</p>
 <p><strong>K-nearest neighbors</strong> is a simple non-parametric method that makes predictions by averaging the outcomes of similar observations in the training data. It is highly flexible and makes no assumptions about the form of f.&nbsp;However, it is not very interpretable because it does not produce coefficients or other summaries of how predictors relate to outcomes. Its predictive accuracy depends strongly on the choice of k and on having a sufficiently large and representative training sample.</p>
 <p>In summary, the landscape of statistical learning methods can be understood through several interconnected dimensions. The parametric versus non-parametric distinction concerns whether a method assumes a specific functional form for <span class="math inline">\(f\)</span> or lets the data determine the shape of the relationship. The interpretability versus flexibility trade-off reflects the tension between methods that produce easily understood results and methods that can capture complex patterns. The prediction versus inference distinction concerns whether our goal is to forecast future outcomes accurately or to understand the mechanisms connecting predictors to responses. These dimensions are interrelated: parametric methods tend to be more interpretable and better suited for inference, while non-parametric methods tend to be more flexible and better suited for prediction when interpretability is not required. The choice among methods depends on the specific goals of an analysis, the nature of the data, the sample size available, and the analyst’s prior beliefs about the likely form of the relationship being studied.</p>
+<p>To complete our overview of the foundational concepts in statistical learning, we need to understand additional distinction between supervised and unsupervised learning that help us categorize different types of learning problems.</p>
+<p><strong>Supervised learning</strong> refers to situations where for each observation in our dataset, we have both predictor measurements and a corresponding outcome measurement. The term “<em>supervised</em>” reflects the idea that the learning process is guided or supervised by the known outcomes. We observe what actually happened for each case in our training data, and we use this information to learn the relationship between predictors and outcomes. All the methods we have discussed so far, including linear regression, logistic regression, decision trees, random forests, and neural networks, fall into the supervised learning category when applied to problems where outcomes are observed. The fundamental goal of supervised learning is to build a model that can predict the outcome for new observations based on their predictor values, or to understand how the predictors relate to the outcome. In sociological research, most studies involve supervised learning because we typically have data on both the explanatory variables and the outcome of interest. For example, when we study the relationship between education and income, we observe both variables for the individuals in our sample, which allows us to estimate how education influences earnings.</p>
+<p><strong>Unsupervised learning</strong> describes a fundamentally different situation where we observe predictor measurements for each observation but have no corresponding outcome variable. Without an outcome to predict or explain, we cannot fit a regression model or train a classifier. Instead, unsupervised learning seeks to discover patterns, structures, or groupings within the data itself. The most common unsupervised learning task is cluster analysis, which attempts to identify subgroups of observations that are similar to one another. For instance, a sociologist might have survey data containing many variables about people’s attitudes, behaviors, and demographic characteristics, but no predefined categorization of people into types. Cluster analysis could reveal that the respondents naturally fall into distinct groups based on their patterns of responses, perhaps identifying clusters that correspond to different lifestyles, political orientations, or consumption patterns. The key feature of unsupervised learning is that there is no “correct answer” to supervise the learning process. We are not trying to predict a known outcome but rather to uncover hidden structure in the data. This makes unsupervised learning more exploratory and somewhat more subjective than supervised learning, since there is no objective criterion like prediction accuracy to evaluate whether we have found the right structure.</p>
+<table class="caption-top table">
+<caption><strong>Table 1.1</strong> Summary table of statistical learning methods</caption>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 20%">
+<col style="width: 9%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 20%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Unsupervised / Supervised</th>
+<th>Parametric / Non-parametric</th>
+<th>Flexibility</th>
+<th>Interpretability</th>
+<th>Best Suited For</th>
+<th>Regression / Classification</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear Regression</td>
+<td>Supervised</td>
+<td>Parametric</td>
+<td>Low</td>
+<td>High</td>
+<td>Inference</td>
+<td>Regression</td>
+</tr>
+<tr class="even">
+<td>Ridge Regression</td>
+<td>Supervised</td>
+<td>Parametric</td>
+<td>Low</td>
+<td>High</td>
+<td>Inference &amp; Prediction</td>
+<td>Regression</td>
+</tr>
+<tr class="odd">
+<td>Lasso</td>
+<td>Supervised</td>
+<td>Parametric</td>
+<td>Low</td>
+<td>High</td>
+<td>Inference &amp; Prediction</td>
+<td>Regression</td>
+</tr>
+<tr class="even">
+<td>Logistic Regression</td>
+<td>Supervised</td>
+<td>Parametric</td>
+<td>Low</td>
+<td>High</td>
+<td>Inference</td>
+<td>Classification</td>
+</tr>
+<tr class="odd">
+<td>Generalized Additive Models (GAMs)</td>
+<td>Supervised</td>
+<td>Parametric (additive structure)</td>
+<td>Medium</td>
+<td>Medium-High</td>
+<td>Inference &amp; Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="even">
+<td>Decision Trees</td>
+<td>Supervised</td>
+<td>Non-parametric</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Inference &amp; Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="odd">
+<td>Bagging</td>
+<td>Supervised</td>
+<td>Non-parametric</td>
+<td>High</td>
+<td>Low</td>
+<td>Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="even">
+<td>Random Forests</td>
+<td>Supervised</td>
+<td>Non-parametric</td>
+<td>High</td>
+<td>Low</td>
+<td>Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="odd">
+<td>Boosting</td>
+<td>Supervised</td>
+<td>Non-parametric</td>
+<td>High</td>
+<td>Low</td>
+<td>Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="even">
+<td>Support Vector Machines (Linear Kernel)</td>
+<td>Supervised</td>
+<td>Parametric</td>
+<td>Low-Medium</td>
+<td>Medium</td>
+<td>Prediction &amp; Inference</td>
+<td>Both</td>
+</tr>
+<tr class="odd">
+<td>Support Vector Machines (Nonlinear Kernel)</td>
+<td>Supervised</td>
+<td>Non-parametric</td>
+<td>High</td>
+<td>Low</td>
+<td>Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="even">
+<td>K-Nearest Neighbors</td>
+<td>Supervised</td>
+<td>Non-parametric</td>
+<td>High</td>
+<td>Low</td>
+<td>Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="odd">
+<td>Neural Networks / Deep Learning</td>
+<td>Supervised</td>
+<td>Non-parametric</td>
+<td>Very High</td>
+<td>Very Low</td>
+<td>Prediction</td>
+<td>Both</td>
+</tr>
+<tr class="even">
+<td>K-Means Clustering</td>
+<td>Unsupervised</td>
+<td>Non-parametric</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Discovering groups in data</td>
+<td>Moderate to Large</td>
+</tr>
+<tr class="odd">
+<td>Hierarchical Clustering</td>
+<td>Unsupervised</td>
+<td>Non-parametric</td>
+<td>Medium</td>
+<td>Medium-High</td>
+<td>Discovering nested group structures</td>
+<td>Moderate</td>
+</tr>
+<tr class="even">
+<td>Principal Component Analysis (PCA)</td>
+<td>Unsupervised</td>
+<td>Parametric</td>
+<td>Low</td>
+<td>Medium-High</td>
+<td>Dimensionality reduction</td>
+<td>Moderate</td>
+</tr>
+<tr class="odd">
+<td>Factor Analysis</td>
+<td>Unsupervised</td>
+<td>Parametric</td>
+<td>Low</td>
+<td>High</td>
+<td>Identifying latent constructs</td>
+<td>Moderate</td>
+</tr>
+</tbody>
+</table>
 
 
 <!-- -->
@@ -842,7 +1023,35 @@ adult\ income = f(educational\ credentials,\ occupation,\ geographic\ region,\ p
 <span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>**K-nearest neighbors** is a simple non-parametric method that makes predictions by averaging the outcomes of similar observations in the training data. It is highly flexible and makes no assumptions about the form of f. However, it is not very interpretable because it does not produce coefficients or other summaries of how predictors relate to outcomes. Its predictive accuracy depends strongly on the choice of k and on having a sufficiently large and representative training sample.</span>
 <span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>In summary, the landscape of statistical learning methods can be understood through several interconnected dimensions. The parametric versus non-parametric distinction concerns whether a method assumes a specific functional form for $f$ or lets the data determine the shape of the relationship. The interpretability versus flexibility trade-off reflects the tension between methods that produce easily understood results and methods that can capture complex patterns. The prediction versus inference distinction concerns whether our goal is to forecast future outcomes accurately or to understand the mechanisms connecting predictors to responses. These dimensions are interrelated: parametric methods tend to be more interpretable and better suited for inference, while non-parametric methods tend to be more flexible and better suited for prediction when interpretability is not required. The choice among methods depends on the specific goals of an analysis, the nature of the data, the sample size available, and the analyst's prior beliefs about the likely form of the relationship being studied.</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>In summary, the landscape of statistical learning methods can be understood through several interconnected dimensions. The parametric versus non-parametric distinction concerns whether a method assumes a specific functional form for $f$ or lets the data determine the shape of the relationship. The interpretability versus flexibility trade-off reflects the tension between methods that produce easily understood results and methods that can capture complex patterns. The prediction versus inference distinction concerns whether our goal is to forecast future outcomes accurately or to understand the mechanisms connecting predictors to responses. These dimensions are interrelated: parametric methods tend to be more interpretable and better suited for inference, while non-parametric methods tend to be more flexible and better suited for prediction when interpretability is not required. The choice among methods depends on the specific goals of an analysis, the nature of the data, the sample size available, and the analyst's prior beliefs about the likely form of the relationship being studied.</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>To complete our overview of the foundational concepts in statistical learning, we need to understand additional distinction between supervised and unsupervised learning that help us categorize different types of learning problems.</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>**Supervised learning** refers to situations where for each observation in our dataset, we have both predictor measurements and a corresponding outcome measurement. The term "*supervised*" reflects the idea that the learning process is guided or supervised by the known outcomes. We observe what actually happened for each case in our training data, and we use this information to learn the relationship between predictors and outcomes. All the methods we have discussed so far, including linear regression, logistic regression, decision trees, random forests, and neural networks, fall into the supervised learning category when applied to problems where outcomes are observed. The fundamental goal of supervised learning is to build a model that can predict the outcome for new observations based on their predictor values, or to understand how the predictors relate to the outcome. In sociological research, most studies involve supervised learning because we typically have data on both the explanatory variables and the outcome of interest. For example, when we study the relationship between education and income, we observe both variables for the individuals in our sample, which allows us to estimate how education influences earnings.</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>**Unsupervised learning** describes a fundamentally different situation where we observe predictor measurements for each observation but have no corresponding outcome variable. Without an outcome to predict or explain, we cannot fit a regression model or train a classifier. Instead, unsupervised learning seeks to discover patterns, structures, or groupings within the data itself. The most common unsupervised learning task is cluster analysis, which attempts to identify subgroups of observations that are similar to one another. For instance, a sociologist might have survey data containing many variables about people's attitudes, behaviors, and demographic characteristics, but no predefined categorization of people into types. Cluster analysis could reveal that the respondents naturally fall into distinct groups based on their patterns of responses, perhaps identifying clusters that correspond to different lifestyles, political orientations, or consumption patterns. The key feature of unsupervised learning is that there is no "correct answer" to supervise the learning process. We are not trying to predict a known outcome but rather to uncover hidden structure in the data. This makes unsupervised learning more exploratory and somewhat more subjective than supervised learning, since there is no objective criterion like prediction accuracy to evaluate whether we have found the right structure.</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> Unsupervised / Supervised <span class="pp">|</span> Parametric / Non-parametric <span class="pp">|</span> Flexibility <span class="pp">|</span> Interpretability <span class="pp">|</span> Best Suited For <span class="pp">|</span> Regression / Classification <span class="pp">|</span> Sample Size Requirements <span class="pp">|</span></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------|---------------------------|-------------|------------------|-----------------|---------------------------|-------------------------|</span></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Linear Regression <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Inference <span class="pp">|</span> Regression <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ridge Regression <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Inference &amp; Prediction <span class="pp">|</span> Regression <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Lasso <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Inference &amp; Prediction <span class="pp">|</span> Regression <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Logistic Regression <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Inference <span class="pp">|</span> Classification <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Generalized Additive Models (GAMs) <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric (additive structure) <span class="pp">|</span> Medium <span class="pp">|</span> Medium-High <span class="pp">|</span> Inference &amp; Prediction <span class="pp">|</span> Both <span class="pp">|</span> Moderate to Large <span class="pp">|</span></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Decision Trees <span class="pp">|</span> Supervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> Medium <span class="pp">|</span> Medium <span class="pp">|</span> Inference &amp; Prediction <span class="pp">|</span> Both <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bagging <span class="pp">|</span> Supervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> High <span class="pp">|</span> Low <span class="pp">|</span> Prediction <span class="pp">|</span> Both <span class="pp">|</span> Large <span class="pp">|</span></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Random Forests <span class="pp">|</span> Supervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> High <span class="pp">|</span> Low <span class="pp">|</span> Prediction <span class="pp">|</span> Both <span class="pp">|</span> Large <span class="pp">|</span></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Boosting <span class="pp">|</span> Supervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> High <span class="pp">|</span> Low <span class="pp">|</span> Prediction <span class="pp">|</span> Both <span class="pp">|</span> Large <span class="pp">|</span></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Support Vector Machines (Linear Kernel) <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low-Medium <span class="pp">|</span> Medium <span class="pp">|</span> Prediction &amp; Inference <span class="pp">|</span> Both <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Support Vector Machines (Nonlinear Kernel) <span class="pp">|</span> Supervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> High <span class="pp">|</span> Low <span class="pp">|</span> Prediction <span class="pp">|</span> Both <span class="pp">|</span> Large <span class="pp">|</span></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> K-Nearest Neighbors <span class="pp">|</span> Supervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> High <span class="pp">|</span> Low <span class="pp">|</span> Prediction <span class="pp">|</span> Both <span class="pp">|</span> Large <span class="pp">|</span></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Neural Networks / Deep Learning <span class="pp">|</span> Supervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> Very High <span class="pp">|</span> Very Low <span class="pp">|</span> Prediction <span class="pp">|</span> Both <span class="pp">|</span> Very Large <span class="pp">|</span></span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> K-Means Clustering <span class="pp">|</span> Unsupervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> Medium <span class="pp">|</span> Medium <span class="pp">|</span> Discovering groups in data <span class="pp">|</span> Moderate to Large <span class="pp">|</span></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Hierarchical Clustering <span class="pp">|</span> Unsupervised <span class="pp">|</span> Non-parametric <span class="pp">|</span> Medium <span class="pp">|</span> Medium-High <span class="pp">|</span> Discovering nested group structures <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Principal Component Analysis (PCA) <span class="pp">|</span> Unsupervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> Medium-High <span class="pp">|</span> Dimensionality reduction <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Factor Analysis <span class="pp">|</span> Unsupervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Identifying latent constructs <span class="pp">|</span> Moderate <span class="pp">|</span></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>: **Table 1.1** Summary table of statistical learning methods</span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
