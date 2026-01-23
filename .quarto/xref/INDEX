@@ -10,5 +10,8 @@
   },
   "references.qmd": {
     "references.html": "6ea3cdf3"
+  },
+  "introduction_to_statistical_learning.qmd": {
+    "introduction_to_statistical_learning.html": "8b147a3c"
   }
 }
