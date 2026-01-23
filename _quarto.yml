@@ -18,6 +18,7 @@ format:
     number-sections: true
     code-fold: true
     code-tools: true
+    css: styles.css
     theme:
       - cosmo
       - brand
