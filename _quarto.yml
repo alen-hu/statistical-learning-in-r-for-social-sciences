@@ -8,9 +8,7 @@ book:
   date: last-modified
   chapters:
     - index.qmd
-    - intro.qmd
-    - summary.qmd
-    - references.qmd
+    - introduction_to_statistical_learning.qmd
 
 bibliography: references.bib
 
