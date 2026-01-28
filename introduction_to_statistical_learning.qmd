@@ -139,3 +139,7 @@ To complete our overview of the foundational concepts in statistical learning, w
 : **Table 1.1** Summary table of statistical learning methods
 
 ## Assessing Model Accuracy
+
+$$
+MSE = \frac{1}{n} \times \sum_{i=1}^n(y_i - \hat{f}(x_i))^2
+$$
