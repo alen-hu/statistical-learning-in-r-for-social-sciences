@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.8.27">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -68,14 +68,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-364982630eef5352dd1537128a8ed5cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-86b712c1a9842e5c5be4cb0afbdd663e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -135,7 +136,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -315,11 +316,11 @@ Y\ =\ f(X_1,\ X_2,\ X_3,\ X_4,\ X_5,\ X_6,\ X_7)\ +\ ϵ
 <table class="caption-top table">
 <caption><strong>Table 1.1</strong> Summary table of statistical learning methods</caption>
 <colgroup>
-<col style="width: 9%">
-<col style="width: 32%">
 <col style="width: 15%">
+<col style="width: 23%">
 <col style="width: 21%">
 <col style="width: 20%">
+<col style="width: 19%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -457,6 +458,9 @@ Y\ =\ f(X_1,\ X_2,\ X_3,\ X_4,\ X_5,\ X_6,\ X_7)\ +\ ϵ
 </section>
 <section id="assessing-model-accuracy" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="assessing-model-accuracy"><span class="header-section-number">1.3</span> Assessing Model Accuracy</h2>
+<p><span class="math display">\[
+MSE = \frac{1}{n} \times \sum_{i=1}^n(y_i - \hat{f}(x_i))^2
+\]</span></p>
 
 
 <!-- -->
@@ -515,13 +519,14 @@ Y\ =\ f(X_1,\ X_2,\ X_3,\ X_4,\ X_5,\ X_6,\ X_7)\ +\ ϵ
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
@@ -923,7 +928,7 @@ Y\ =\ f(X_1,\ X_2,\ X_3,\ X_4,\ X_5,\ X_6,\ X_7)\ +\ ϵ
   <div class="nav-page nav-page-next">
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Introduction to Statistical Learning"</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> ""</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
@@ -1042,7 +1047,7 @@ Y\ =\ f(X_1,\ X_2,\ X_3,\ X_4,\ X_5,\ X_6,\ X_7)\ +\ ϵ
 <span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>**Unsupervised learning** describes a fundamentally different situation where we observe predictor measurements for each observation but have no corresponding response variable. Without a dependent variable to predict or explain, we cannot fit a regression model or train a classifier. Instead, unsupervised learning seeks to discover patterns, structures, or groupings within the data itself. The most common unsupervised learning task is cluster analysis, which attempts to identify subgroups of observations that are similar to one another. For instance, a sociologist might have survey data containing many variables about people's attitudes, behaviors, and demographic characteristics, but no predefined categorization of people into types. Cluster analysis could reveal that the respondents naturally fall into distinct groups based on their patterns of responses, perhaps identifying clusters that correspond to different lifestyles, political orientations, or consumption patterns. The key feature of unsupervised learning is that there is no "correct answer" to supervise the learning process. We are not trying to predict a known outcome but rather to uncover hidden structure in the data. This makes unsupervised learning more exploratory and somewhat more subjective than supervised learning, since there is no objective criterion like prediction accuracy to evaluate whether we have found the right structure.</span>
 <span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Method <span class="pp">|</span> Unsupervised / Supervised <span class="pp">|</span> Parametric / Non-parametric <span class="pp">|</span> Flexibility <span class="pp">|</span> Interpretability <span class="pp">|</span> Best Suited For <span class="pp">|</span></span>
-<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------|---------------------------|-------------|------------------|-----------------|</span></span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------------|---------------------|-------------------|------------------|-----------------|</span></span>
 <span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Linear Regression <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Inference <span class="pp">|</span></span>
 <span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ridge Regression <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Inference &amp; Prediction <span class="pp">|</span></span>
 <span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Lasso <span class="pp">|</span> Supervised <span class="pp">|</span> Parametric <span class="pp">|</span> Low <span class="pp">|</span> High <span class="pp">|</span> Inference &amp; Prediction <span class="pp">|</span></span>
@@ -1063,7 +1068,11 @@ Y\ =\ f(X_1,\ X_2,\ X_3,\ X_4,\ X_5,\ X_6,\ X_7)\ +\ ϵ
 <span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>: **Table 1.1** Summary table of statistical learning methods</span>
 <span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a><span class="fu">## Assessing Model Accuracy</span></span></code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a><span class="fu">## Assessing Model Accuracy</span></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>MSE = \frac{1}{n} \times \sum_{i=1}^n(y_i - \hat{f}(x_i))^2</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>$$</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

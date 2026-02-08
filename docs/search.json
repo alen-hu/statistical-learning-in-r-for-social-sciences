@@ -44,7 +44,7 @@
     "href": "introduction_to_statistical_learning.html#assessing-model-accuracy",
     "title": "1  Introduction to Statistical Learning",
     "section": "1.3 Assessing Model Accuracy",
-    "text": "1.3 Assessing Model Accuracy",
+    "text": "1.3 Assessing Model Accuracy\n\\[\nMSE = \\frac{1}{n} \\times \\sum_{i=1}^n(y_i - \\hat{f}(x_i))^2\n\\]",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Introduction to Statistical Learning</span>"
     ]
