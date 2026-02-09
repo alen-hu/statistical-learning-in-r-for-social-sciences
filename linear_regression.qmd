@@ -1,0 +1,19 @@
+---
+title: "Linear Regression"
+description: ""
+number-sections: true
+title-block-banner: "#00868B"
+title-block-banner-color: "white"
+---
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+
+student_performance <- read_csv("datasets/StudentPerformanceFactors.csv",)
+
+student_performance
+```
+
+https://www.kaggle.com/datasets/lainguyn123/student-performance-factors

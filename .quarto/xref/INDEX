@@ -13,5 +13,8 @@
   },
   "introduction_to_statistical_learning.qmd": {
     "introduction_to_statistical_learning.html": "8b147a3c"
+  },
+  "linear_regression.qmd": {
+    "linear_regression.html": "8375ae5c"
   }
 }

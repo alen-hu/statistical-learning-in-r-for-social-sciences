@@ -9,6 +9,7 @@ book:
   chapters:
     - index.qmd
     - introduction_to_statistical_learning.qmd
+    - linear_regression.qmd
 
 bibliography: references.bib
 
