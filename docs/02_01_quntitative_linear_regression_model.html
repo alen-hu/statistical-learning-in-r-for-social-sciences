@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Quntitative Linear Regression Model – Statistical Learning in R for Social Sciences</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02_00_linear_regression_model.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-86b712c1a9842e5c5be4cb0afbdd663e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: white;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: white;
+background: #00868B;
+      }
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02_00_linear_regression_model.html">Linear Regression Model</a></li><li class="breadcrumb-item"><a href="./02_01_quntitative_linear_regression_model.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Quntitative Linear Regression Model</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02_00_linear_regression_model.html">Linear Regression Model</a></li><li class="breadcrumb-item"><a href="./02_01_quntitative_linear_regression_model.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Quntitative Linear Regression Model</span></a></li></ol></nav>
+      <div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Quntitative Linear Regression Model</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Statistical Learning in R for Social Sciences</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./introduction_to_statistical_learning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Statistical Learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./02_00_linear_regression_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Regression Model</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_01_quntitative_linear_regression_model.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Quntitative Linear Regression Model</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#estimating-the-coefficients-of-parameters" id="toc-estimating-the-coefficients-of-parameters" class="nav-link active" data-scroll-target="#estimating-the-coefficients-of-parameters"><span class="header-section-number">1</span> Estimating the Coefficients of Parameters</a></li>
+  <li><a href="#accuracy-of-the-coefficient-estimates" id="toc-accuracy-of-the-coefficient-estimates" class="nav-link" data-scroll-target="#accuracy-of-the-coefficient-estimates"><span class="header-section-number">2</span> Accuracy of the Coefficient Estimates</a>
+  <ul class="collapse">
+  <li><a href="#standard-errors" id="toc-standard-errors" class="nav-link" data-scroll-target="#standard-errors"><span class="header-section-number">2.1</span> Standard Errors</a></li>
+  <li><a href="#hypothesis-testing-and-the-t-statistic" id="toc-hypothesis-testing-and-the-t-statistic" class="nav-link" data-scroll-target="#hypothesis-testing-and-the-t-statistic"><span class="header-section-number">2.2</span> Hypothesis Testing and the t-Statistic</a></li>
+  <li><a href="#the-p-value" id="toc-the-p-value" class="nav-link" data-scroll-target="#the-p-value"><span class="header-section-number">2.3</span> The p-Value</a></li>
+  <li><a href="#model-fit" id="toc-model-fit" class="nav-link" data-scroll-target="#model-fit"><span class="header-section-number">2.4</span> Model Fit</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>The simplest form of linear regression involves just one predictor variable. This is called <strong>simple linear regression</strong>. Mathematically, it takes the form:</p>
+<p><span class="math inline">\(Y \approx \beta_0 + \beta_1X\)</span></p>
+<p>In this equation, Y is the dependent variable - the outcome we want to predict. In our example, Y is, for example, the variable “exam_score”. X is the independent variable - the factor we believe is related to the outcome. For instance, X could be “hours_studied”. The symbol <span class="math inline">\(\beta_0\)</span> is called the <strong>intercept</strong>. It represents the expected value of Y when X equals zero. In our context, it would represent the expected exam score for a hypothetical student who studies zero hours. The symbol <span class="math inline">\(\beta_1\)</span> is called the <strong>slope</strong>. It represents the average change in Y that is associated with a one-unit increase in X. In our example, it tells us how many additional points on the exam a student can expect to gain for each additional hour of studying. Together, <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are called the <strong>model coefficients or parameters</strong>.</p>
+<p>Of course, in real life we do not know the true values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. We must estimate them from the data. Once we have estimated these coefficients - and we denote the estimates with a hat symbol as <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> - we can write our prediction equation as: <span class="math inline">\(y = \hat{\beta_0} + \hat{\beta_1}x\)</span>. Here, <span class="math inline">\(\hat{y}\)</span> is the predicted value of the response for a given value <span class="math inline">\(x\)</span> of the predictor. The hat symbol always indicates that we are dealing with an estimate rather than a true and known quantity.</p>
+<p>In practice, a single predictor is rarely sufficient to explain all the variation in the response. A student’s exam score is not determined by study hours alone - attendance, prior academic performance, tutoring, and many other factors play a role. <strong>Multiple linear regression</strong> extends the simple model to accommodate several predictors simultaneously. The general formula is:</p>
+<p><span class="math inline">\(Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_pX_p + \epsilon\)</span></p>
+<p>In this equation, <span class="math inline">\(X_1, X_2, X_3, ..., X_p\)</span> represent p different predictor variables, and <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_2\)</span>, …, <span class="math inline">\(\beta_p\)</span> are their corresponding slope coefficients. Each coefficient <span class="math inline">\(\beta_j\)</span> represents the average change in Y associated with a one-unit increase in the predictor <span class="math inline">\(\beta_j\)</span>, while holding all other predictors constant. This “holding all other predictors constant” interpretation is crucial and is what distinguishes multiple regression from simply running many separate simple regressions. The term <span class="math inline">\(\epsilon\)</span> represents the error term - it captures everything that our model does not explain, including the influence of unmeasured variables, measurement error, and the inherent randomness in human behavior.</p>
+<p>In our Student Performance example, a multiple linear regression model might look like this:</p>
+<p>exam_score = <span class="math inline">\(\beta_0\)</span> + <span class="math inline">\(\beta_1\)</span> × hours_studied + <span class="math inline">\(\beta_2\)</span> × attendance + <span class="math inline">\(\beta_3\)</span> × previous_scores + <span class="math inline">\(\beta_4\)</span> × sleep_hours + <span class="math inline">\(\beta_5\)</span> × tutoring_sessions + <span class="math inline">\(\beta_6\)</span> × physical_activity + <span class="math inline">\(\epsilon\)</span></p>
+<p>This model allows us to estimate the unique contribution of each predictor to the exam score. For instance, <span class="math inline">\(\beta_1\)</span> tells us the expected change in exam score for each additional hour of study, after accounting for the effects of attendance, previous scores, sleep, tutoring, and physical activity. This is fundamentally different from simple linear regression, where <span class="math inline">\(\beta_1\)</span> would capture the total association between study hours and exam scores without adjusting for any other factor.</p>
+<section id="estimating-the-coefficients-of-parameters" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="estimating-the-coefficients-of-parameters"><span class="header-section-number">1</span> Estimating the Coefficients of Parameters</h2>
+<p>The key question is how do we actually find the best values for our coefficient estimates <span class="math inline">\(\hat{\beta}_0\)</span>, <span class="math inline">\(\hat{\beta}_1\)</span>, …, <span class="math inline">\(\hat{\beta}_p\)</span>? The answer lies in the <strong>least squares method</strong>, which is the most common approach for fitting a linear regression model. The basic idea is intuitive: we want our predicted values <span class="math inline">\(\hat{y}_i\)</span> to be as close as possible to the actual observed values <span class="math inline">\(y_0\)</span> for every observation in our dataset.</p>
+<p>For each observation <span class="math inline">\(i\)</span>, the difference between the observed value and the predicted value is called the <strong>residual</strong>, denoted <span class="math inline">\(e_i = y_i - \hat{y}_i\)</span>. The residual tells us how much our model’s prediction misses the actual outcome for that particular student. Some residuals will be positive (when the model underpredicts) and some will be negative (when the model overpredicts).</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="02_01_quntitative_linear_regression_model_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption>Simple Linear Regression: Exam Score ~ Hours Studied</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>To get an overall measure of how well the model fits all the data, we cannot simply add up the residuals, because the positive and negative ones would cancel each other out. Instead, we square each residual and then sum them all up. This quantity is called the <strong>residual sum of squares</strong> (RSS):</p>
+<p><span class="math inline">\(RSS = e_1^2 + e_2^2 + ... + e_n^2 = \sum(y_i - \hat{y}_i)^2\)</span></p>
+<p>The least squares method chooses the coefficient estimates <span class="math inline">\(\hat{\beta}_0\)</span>, <span class="math inline">\(\hat{\beta}_1\)</span>, …, <span class="math inline">\(\hat{\beta}_p\)</span> that minimize this RSS. In other words, the least squares approach finds the line (in simple regression) or the hyperplane (in multiple regression) that makes the total squared prediction error as small as possible. This is a well-defined mathematical optimization problem, and the solution can be computed using calculus. For simple linear regression, the formulas for the minimizers have a closed-form expression:</p>
+<p><span class="math inline">\(\hat{\beta}_1 = \frac{\sum_{i = 1}^n(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i = 1}^n(x_i - \bar{x})^2}\)</span></p>
+<p><span class="math inline">\(\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\hat{x}\)</span></p>
+<p>Here, <span class="math inline">\(\bar{x}\)</span> and <span class="math inline">\(\bar{y}\)</span> are the sample means of the predictor and the response, respectively. The formula for <span class="math inline">\(\hat{\beta}_1\)</span> has an intuitive interpretation: it measures the degree to which X and Y vary together (the numerator captures their joint variation) relative to the total variation in X (the denominator). For multiple linear regression, the coefficient estimates are computed using matrix algebra, which is handled automatically by statistical software such as R.</p>
+<p>The beauty of the least squares method is that it provides a principled, objective way to estimate the model parameters. It does not require any subjective judgment about what the “best” line should look like - the method simply finds the line that minimizes the total squared distance between the observed data points and the fitted line.</p>
+<p>Now let us apply these concepts to our <code>student_performance</code> dataset. We will fit both a simple linear regression (predicting “exam_score” from “hours_studied” alone) and a multiple linear regression (predicting “exam_score” from six quantitative predictors).</p>
+<p>To fit a simple linear regression model in R, we use the <code>lm()</code> function, which stands for linear model. The syntax follows the pattern <code>lm(response ~ predictor, data = dataset)</code>. The tilde symbol (<code>~</code>) can be read as “<em>is modeled as a function of</em>”. For our simple linear regression of “exam_score” onto “hours_studied”, we write:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>simple_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    exam_score <span class="sc">~</span> hours_studied,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> student_performance</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The lm() function fits the model by computing the least squares coefficient estimates. The <code>summary()</code> function then provides a detailed output that includes the estimated coefficients, their standard errors, t-statistics, p-values, the residual standard error, and the <span class="math inline">\(R^2\)</span> statistic. The <code>confint()</code> function computes the 95% confidence intervals for each coefficient estimate, which tell us the range of plausible values for the true population parameters.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = exam_score ~ hours_studied, data = student_performance)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-8.532 -2.243 -0.111  2.046 33.493 
+
+Coefficients:
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   61.456984   0.149196  411.92   &lt;2e-16 ***
+hours_studied  0.289291   0.007154   40.44   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 3.483 on 6605 degrees of freedom
+Multiple R-squared:  0.1984,    Adjusted R-squared:  0.1983 
+F-statistic:  1635 on 1 and 6605 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>The <code>lm()</code> function fits the model by computing the least squares coefficient estimates, and the output shows the estimated parameters of a simple linear regression model predicting exam score from hours studied. The intercept (<span class="math inline">\(\hat{\beta}_0\)</span>) is estimated at 61.4570. This means that when “hours_studied” equals zero, the model predicts an exam score of approximately 61.46 points. In substantive terms, a hypothetical student who does not study at all would be expected to score about 61.5 on the exam, according to this model. This makes intuitive sense - students would still have some baseline level of knowledge from attending classes, even without additional study outside the classroom. The slope for hours_studied (<span class="math inline">\(\hat{\beta}_1\)</span>) is estimated at 0.289. This is the key coefficient for our research question. It tells us that for each additional hour of study per week, a student’s exam score is expected to increase by approximately 0.29 points, on average. So a student who studies 10 hours more per week than another student would be expected to score about 2.89 points higher on the exam. The direction of the relationship is positive, which aligns with our intuition that more studying leads to better performance.</p>
+<p>For the multiple linear regression model, we simply add more predictors to the right side of the formula, separated by the <span class="math inline">\(+\)</span> sign:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>multiple_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    exam_score <span class="sc">~</span> hours_studied <span class="sc">+</span> attendance <span class="sc">+</span> previous_scores <span class="sc">+</span> sleep_hours <span class="sc">+</span> tutoring_sessions <span class="sc">+</span> physical_activity,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> student_performance</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = exam_score ~ hours_studied + attendance + previous_scores + 
+    sleep_hours + tutoring_sessions + physical_activity, data = student_performance)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.4391 -1.1316 -0.1619  0.8435 30.9951 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)       40.927132   0.338284 120.985  &lt; 2e-16 ***
+hours_studied      0.291579   0.005069  57.517  &lt; 2e-16 ***
+attendance         0.197978   0.002631  75.262  &lt; 2e-16 ***
+previous_scores    0.048123   0.002110  22.809  &lt; 2e-16 ***
+sleep_hours       -0.018022   0.020686  -0.871    0.384    
+tutoring_sessions  0.493505   0.024679  19.997  &lt; 2e-16 ***
+physical_activity  0.143997   0.029449   4.890 1.03e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.467 on 6600 degrees of freedom
+Multiple R-squared:  0.5982,    Adjusted R-squared:  0.5979 
+F-statistic:  1638 on 6 and 6600 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>This tells R to fit a model that predicts “exam_score” using all six quantitative predictors simultaneously. The least squares method will estimate a separate slope coefficient for each predictor, along with a single intercept, by minimizing the total RSS across all 6,607 observations. Our multiple linear regression model includes six quantitative predictors simultaneously. The estimated model can be written as:</p>
+<p>Exam_Score ≈ 40.93 + 0.292 × Hours_Studied + 0.198 × Attendance + 0.048 × Previous_Scores − 0.018 × Sleep_Hours + 0.494 × Tutoring_Sessions + 0.144 × Physical_Activity</p>
+<p>The intercept (<span class="math inline">\(\hat{\beta}_0\)</span>) is now estimated at 40.927. This is substantially lower than in the simple model (61.46), which makes sense. In the simple model, the intercept represented the predicted score when only “hours_studied” was zero. In the multiple model, the intercept represents the predicted score when all six predictors are simultaneously zero — that is, a hypothetical student who studies zero hours, has zero attendance, has zero previous scores, gets zero sleep, has zero tutoring sessions, and does zero physical activity. Such a student is of course entirely hypothetical and unrealistic, which is why we should not over-interpret the intercept in multiple regression. Its main role is mathematical - it anchors the regression plane in the right position.</p>
+<p>The coefficient for “hours_studied” is 0.292, which is remarkably similar to its value in the simple regression (0.289). This tells us something important: the relationship between study hours and exam scores is robust - it persists even after we account for the effects of attendance, prior scores, sleep, tutoring, and physical activity. In substantive terms, holding all other factors constant, each additional hour of study per week is associated with an increase of about 0.29 points on the exam.</p>
+<p>The coefficient for “attendance” is 0.198, meaning that each additional percentage point of class attendance is associated with about 0.20 additional points on the exam, after controlling for the other variables. To put this in perspective, a student who attends 90% of classes versus one who attends 70% of classes (a 20 percentage-point difference) would be expected to score about 3.96 points higher, all else being equal.</p>
+<p>The coefficient for “previous_scores” is 0.048. This means that for each additional point a student earned on their previous assessments, their exam score is expected to increase by about 0.048 points, holding other factors constant. A student whose prior scores are 20 points higher than another student’s would be expected to score only about 0.96 points higher on this exam. This suggests that while past performance does predict future performance, its incremental contribution is small once study habits and attendance are already accounted for.</p>
+<p>The coefficient for “sleep_hours” is -0.018. This is the only predictor whose coefficient is not statistically significant in this model. The negative sign suggests that more sleep is associated with slightly lower exam scores, meaning that each additional hour of sleep per night is associated with a decrease of about 0.02 points on the exam, after controlling for the other variables.</p>
+<p>The coefficient for “tutoring_sessions” is 0.494, the largest individual slope coefficient in the model. Each additional tutoring session is associated with about half a point increase on the exam. A student who attended 4 tutoring sessions compared to one who attended none would be expected to score about 1.97 points higher.</p>
+<p>The coefficient for physical_activity is 0.144, meaning that each additional hour per week of physical activity is associated with about 0.14 additional exam points, after controlling for the other variables.</p>
+</section>
+<section id="accuracy-of-the-coefficient-estimates" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="accuracy-of-the-coefficient-estimates"><span class="header-section-number">2</span> Accuracy of the Coefficient Estimates</h2>
+<p>In the previous section, we estimated the coefficients of our linear regression models using the least squares method. We found, for instance, that the estimated slope for “hours_studied” was 0.289 in the simple model and 0.292 in the multiple model. But a natural and critically important question follows: <em>How accurate are these estimates? If we collected a different sample of 6,607 students, would we get the same coefficient estimates, or would they change? And how confident can we be that the true relationship between study hours and exam scores is actually positive, rather than our estimate simply being a product of random chance in this particular sample?</em></p>
+<p>These questions lie at the heart of statistical inference, and the tools we use to answer them - standard errors, confidence intervals, t-statistics, and p-values - are among the most important concepts in all of applied statistics. To understand these tools, we must first understand the concept of the error term and the distinction between the population regression line and our estimated regression line.</p>
+<p>When we write the linear regression model as <span class="math inline">\(Y = \beta_0 + \beta_1X + \epsilon\)</span>, we are making a statement about the true, underlying relationship between X and Y in the entire population - not just in our particular sample. The coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are the true population parameters, which we will never know exactly. The term <span class="math inline">\(\epsilon\)</span> is the error term, and it represents everything that our model fails to capture. There are several reasons why the error term exists.</p>
+<ol type="1">
+<li><p>First, the true relationship between the predictor and the response may not be perfectly linear - there may be curvature or other patterns that a straight line cannot capture.</p></li>
+<li><p>Second, there may be other variables that influence the response but are not included in our model.</p></li>
+<li><p>Third, there is always some inherent randomness and measurement error in any data we collect.</p></li>
+</ol>
+<p>The error term absorbs all of these sources of discrepancy between what our model predicts and what actually happens.</p>
+<p>In our <code>student_performance</code> example, even if we knew the exact true values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> for the relationship between “hours_studied” and “exam_score” in the entire population of all students, we still could not predict any individual student’s exam score perfectly. Some students who study 20 hours per week will score higher than the regression line predicts, and others will score lower. These deviations are captured by <span class="math inline">\(\epsilon\)</span>. We typically assume that the error term has a mean of zero (meaning the model does not systematically overpredict or underpredict), that the errors for different observations are independent of each other, and that the errors have a constant variance <span class="math inline">\(\sigma^2\)</span> across all values of X.</p>
+<p>The true population regression line, <span class="math inline">\(Y = \beta_0 + \beta_1X\)</span>, represents the best linear summary of the relationship between X and Y in the entire population. Our estimated regression line, <span class="math inline">\(\hat{y} = \hat{\beta}_0 + \hat{\beta}_1x\)</span>, is our best approximation of this population line based on the data we have. The key insight is that <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> are estimates of the true parameters, computed from one particular sample. If we were to draw a different random sample of 6,607 students, we would get slightly different estimates. This variability across samples is what motivates the need for standard errors, confidence intervals, and hypothesis tests - they allow us to quantify how much uncertainty surrounds our estimates.</p>
+<section id="standard-errors" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="standard-errors"><span class="header-section-number">2.1</span> Standard Errors</h3>
+<p>The <strong>standard error</strong> of a coefficient estimate measures how much that estimate would vary if we repeatedly drew new samples from the same population and re-estimated the model each time. In other words, it quantifies the precision of our estimate. A small standard error means that our estimate is very precise - different samples would give us very similar coefficient values. A large standard error means that our estimate is imprecise - it might change substantially from sample to sample.</p>
+<p>The standard error of the intercept and the slope coefficients in simple linear regression is given by the formulas:</p>
+<p><span class="math inline">\(SE(\hat{\beta}_0) = \sigma^2 [\frac{1}{n} + \frac{\bar{x}^2}{\sum_{i =1}^n(x_i - \bar{x})^2}]\)</span></p>
+<p><span class="math inline">\(SE(\hat{\beta}_1) = \frac{\sigma}{\sum_{i=1}^n(x_i - \bar{x})^2}\)</span></p>
+<p>This formulas reveals two important things. First, the standard error depends on <span class="math inline">\(\sigma\)</span>, the standard deviation of the error term. If there is a lot of noise in the data (large <span class="math inline">\(\sigma\)</span>), then the estimated slope will be less precise, because the true signal is harder to detect amid the noise. Second, the standard error depends on the spread of the predictor values. When the <span class="math inline">\(x_i\)</span> values are more spread out (that is, when <span class="math inline">\(\sum_{i=1}^n(x_i - \bar{x})^2\)</span> is large), the standard error is smaller. Intuitively, this makes sense: if we observe students who study anywhere from 1 to 44 hours per week, we have a much better basis for estimating the slope than if all students studied between 19 and 21 hours. A wider range of predictor values gives us more “leverage” to pin down the relationship. In practice, the true value of <span class="math inline">\(\sigma\)</span> is unknown and must be estimated from the data. This estimate is the Residual Standard Error.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>coefficients[, <span class="st">"Std. Error"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  (Intercept) hours_studied 
+  0.149196057   0.007154262 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>coefficients[, <span class="st">"Std. Error"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      (Intercept)     hours_studied        attendance   previous_scores 
+      0.338284044       0.005069489       0.002630507       0.002109816 
+      sleep_hours tutoring_sessions physical_activity 
+      0.020685503       0.024678804       0.029448624 </code></pre>
+</div>
+</div>
+<p>Looking at our simple regression output, the standard error for the “hours_studied” coefficient is 0.00715. This is very small relative to the coefficient estimate of 0.289, which tells us that our estimate is highly precise. The reason for this high precision is our large sample size (6,607 observations) combined with a good spread in study hours (ranging from 1 to 44). In the multiple regression model, the standard error for “hours_studied” is even smaller at 0.00507. This decrease occurs because the multiple model has a lower RSE (2.467 compared to 3.483), which means there is less unexplained noise once we account for the additional predictors - and less noise translates directly into more precise coefficient estimates.</p>
+<p>The standard errors for the other coefficients in the multiple model tell a similar story. “attendance” has a standard error of 0.00263, “previous_scores” has 0.00211, “sleep_hours” has 0.0207, “tutoring_sessions” has 0.0247, and “physical_activity” has 0.0294. Notice that “sleep_hours” has a relatively large standard error compared to its coefficient estimate (-0.018), which foreshadows the fact that this coefficient will not be statistically significant - the estimate is so imprecise relative to its magnitude that we cannot confidently distinguish it from zero.</p>
+<p>A <strong>confidence interval</strong> provides a range of plausible values for the true population parameter. The 95% confidence interval for a regression coefficient is constructed using the formula:</p>
+<p><span class="math inline">\(\hat{\beta}_j \pm 2 \times SE(\hat{\beta}_j)\)</span></p>
+<p>More precisely, the multiplier is not exactly 2 but rather the 97.5th percentile of the t-distribution with n − p − 1 degrees of freedom, where n is the sample size and p is the number of predictors. For large samples like ours (n = 6,607), this value is very close to 1.96, which is approximately 2. The interpretation of a 95% confidence interval is as follows: if we were to repeat the study many times, drawing a new random sample each time and computing a 95% confidence interval from each sample, then 95% of those intervals would contain the true population parameter. It is important to note that this does not mean there is a 95% probability that the true parameter lies within our specific interval - the true parameter is a fixed (though unknown) value, not a random quantity. Rather, the 95% refers to the long-run reliability of the procedure.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(simple_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                  2.5 %     97.5 %
+(Intercept)   61.164511 61.7494561
+hours_studied  0.275266  0.3033153</code></pre>
+</div>
+</div>
+<p>Let us examine the confidence intervals from our outputs. In the simple regression, the 95% confidence interval for the “hours_studied” coefficient is [0.275, 0.303]. This interval is narrow, reflecting the high precision of our estimate, and it lies entirely above zero. We can therefore state with 95% confidence that the true effect of one additional hour of study falls somewhere between 0.275 and 0.303 points on the exam. The fact that zero is not included in this interval is directly connected to our ability to reject the null hypothesis that the coefficient is zero - which brings us to hypothesis testing.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(multiple_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                        2.5 %      97.5 %
+(Intercept)       40.26398610 41.59027841
+hours_studied      0.28164155  0.30151722
+attendance         0.19282088  0.20313417
+previous_scores    0.04398664  0.05225848
+sleep_hours       -0.05857194  0.02252862
+tutoring_sessions  0.44512667  0.54188355
+physical_activity  0.08626812  0.20172578</code></pre>
+</div>
+</div>
+<p>In the multiple regression, the confidence intervals are similarly informative. For “attendance”, the interval is [0.193, 0.203], meaning we are 95% confident that each additional percentage point of attendance is associated with between 0.19 and 0.20 additional exam points, after controlling for the other predictors. For “tutoring_sessions”, the interval is [0.445, 0.542], and for “physical_activity” it is [0.086, 0.202] - all comfortably above zero. The critical case is “sleep_hours”, whose confidence interval is [-0.059, 0.023]. Because this interval spans from a negative value to a positive value, crossing zero in the middle, we cannot determine whether the true effect of sleep hours on exam scores is positive, negative, or simply zero. This is exactly what it means for a coefficient to be statistically non-significant.</p>
+</section>
+<section id="hypothesis-testing-and-the-t-statistic" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="hypothesis-testing-and-the-t-statistic"><span class="header-section-number">2.2</span> Hypothesis Testing and the t-Statistic</h3>
+<p><strong>Hypothesis testing</strong> provides a formal framework for determining whether the relationship we observe in our sample is likely to reflect a real relationship in the population, or whether it could plausibly be due to random chance. In the context of linear regression, the most common hypothesis test for each coefficient is:</p>
+<p><strong>The null hypothesis (<span class="math inline">\(H_0\)</span>):</strong> <span class="math inline">\(\beta_j = 0\)</span>, meaning there is no relationship between the predictor <span class="math inline">\(X_j\)</span> and the response Y.</p>
+<p><strong>The alternative hypothesis (<span class="math inline">\(H_a\)</span>):</strong> <span class="math inline">\(\beta_j \neq 0\)</span>, meaning there is some relationship between the predictor <span class="math inline">\(X_j\)</span> and the response Y.</p>
+<p>If the null hypothesis is true and the predictor truly has no effect on the response, then the true slope is zero, and any non-zero slope we estimate from our sample is simply due to random noise. The t-statistic allows us to assess how likely this scenario is.</p>
+<p>The t-statistic is computed as:</p>
+<p><span class="math inline">\(t = \frac{\hat{\beta}_j}{SE(\hat{\beta}_j)}\)</span></p>
+<p>This is simply the coefficient estimate divided by its standard error. It measures how many standard errors the coefficient estimate is away from zero. A t-statistic close to zero means that the coefficient estimate is small relative to its uncertainty, which is consistent with the null hypothesis. A t-statistic far from zero (either very positive or very negative) means that the coefficient estimate is large relative to its uncertainty, which provides evidence against the null hypothesis.</p>
+<p>Under the null hypothesis, the t-statistic follows a t-distribution with n − p − 1 degrees of freedom, where n is the number of observations and p is the number of predictors. For large samples, the t-distribution is virtually identical to the standard normal distribution, so a t-statistic beyond roughly <span class="math inline">\(\pm2\)</span> is generally considered statistically significant at the 5% level, and beyond roughly <span class="math inline">\(\pm2,75\)</span> is significant at the 1% level.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>coefficients[, <span class="st">"t value"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  (Intercept) hours_studied 
+    411.92096      40.43612 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>coefficients[, <span class="st">"t value"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      (Intercept)     hours_studied        attendance   previous_scores 
+      120.9845189        57.5165220        75.2621118        22.8088935 
+      sleep_hours tutoring_sessions physical_activity 
+       -0.8712218        19.9971244         4.8897684 </code></pre>
+</div>
+</div>
+<p>Let us look at the t-statistics from our outputs. In the simple regression model, the t-statistic for “hours_studied” is 40.44. This means the coefficient estimate is more than 40 standard errors away from zero. To put this in perspective, if study hours truly had no effect on exam scores, observing a t-statistic this large would be essentially impossible - it would be like flipping a fair coin and getting heads 40 times in a row, except far less likely even than that. This gives us overwhelming evidence that the relationship between study hours and exam scores is real.</p>
+<p>In the multiple regression model, the t-statistics reveal a clear hierarchy of evidence. “attendance” has the largest t-statistic at 75.26, making it the most precisely estimated and most strongly significant predictor. “hours_studied” follows with t = 57.52, then “previous_scores” at 22.81, “tutoring_sessions” at 20.00, and “physical_activity” at 4.89. All of these are far beyond any conventional significance threshold. The exception, as we have seen, is “sleep_hours”, with a t-statistic of only -0.871. This value is well within the range we would expect to see even if the true coefficient were zero - it is less than one standard error away from zero, which is entirely unremarkable.</p>
+</section>
+<section id="the-p-value" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="the-p-value"><span class="header-section-number">2.3</span> The p-Value</h3>
+<p>The <strong>p-value</strong> is the probability of observing a t-statistic as extreme as (or more extreme than) the one we actually computed, assuming that the null hypothesis is true. In other words, it answers the question: <em>if there were truly no relationship between this predictor and the response, how surprising would our observed result be?</em></p>
+<p>A small p-value (typically below 0.05, though this threshold is a convention rather than a law of nature) indicates that the observed result would be very surprising under the null hypothesis, and we therefore reject the null hypothesis in favor of the alternative. A large p-value indicates that the observed result is not particularly surprising under the null hypothesis, and we therefore fail to reject it. It is important to emphasize that “failing to reject” is not the same as “accepting” the null hypothesis - it simply means we do not have enough evidence to conclude that a relationship exists.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>coefficients[, <span class="st">"Pr(&gt;|t|)"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  (Intercept) hours_studied 
+ 0.000000e+00 1.286349e-319 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>coefficients[, <span class="st">"Pr(&gt;|t|)"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      (Intercept)     hours_studied        attendance   previous_scores 
+     0.000000e+00      0.000000e+00      0.000000e+00     6.622656e-111 
+      sleep_hours tutoring_sessions physical_activity 
+     3.836647e-01      2.030741e-86      1.033431e-06 </code></pre>
+</div>
+</div>
+<p>In our simple regression output, the p-value for “hours_studied” is less than <span class="math inline">\(2 \times 10^{-16}\)</span>, which R displays as “&lt;2e-16”. This is the smallest p-value that R can represent numerically, and it is so close to zero that for all practical purposes it means the probability of observing our results by chance alone is essentially zero. The three asterisks (***) next to this p-value correspond to the highest significance level in R’s coding system, indicating p &lt; 0.001.</p>
+<p>In the multiple regression, the p-values for “hours_studied”, “attendance”, “previous_scores”, and “tutoring_sessions” are all less than <span class="math inline">\(2 \times 10^{-16}\)</span>, and the p-value for “physical_activity” is approximately <span class="math inline">\(1.03 \times 10^{-6}\)</span> (or about one in a million). All of these are far below any conventional significance threshold, providing overwhelming evidence that these predictors are genuinely related to exam scores.</p>
+<p>The p-value for “sleep_hours”, however, is 0.384. This means that if sleep hours truly had no effect on exam scores (after controlling for the other predictors), there would be about a 38.4% probability of observing a coefficient estimate as far from zero as the one we found. In other words, our observed result is entirely unsurprising under the null hypothesis - it is the kind of result we would expect to see by random chance alone roughly 38 times out of 100. We therefore have no grounds to reject the null hypothesis for “sleep_hours”, and we conclude that this variable does not have a statistically significant linear relationship with exam scores in this model.</p>
+<p>These four concepts - standard errors, confidence intervals, t-statistics, and p-values - are deeply interconnected and are essentially different ways of expressing the same underlying information about the precision and significance of a coefficient estimate. The standard error is the foundation: it tells us how precise our estimate is. The t-statistic is built from the standard error by dividing the estimate by its standard error, which standardizes the estimate to a common scale. The p-value is derived from the t-statistic by computing the probability of such an extreme value under the null hypothesis. And the confidence interval is constructed by adding and subtracting approximately two standard errors from the estimate. All four approaches will always lead to the same conclusion: if the p-value is below 0.05, then the t-statistic will be beyond approximately <span class="math inline">\(\pm2\)</span>, and the 95% confidence interval will not include zero. Conversely, if the p-value is above 0.05, the t-statistic will be between -2 and 2, and the confidence interval will include zero.</p>
+</section>
+<section id="model-fit" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="model-fit"><span class="header-section-number">2.4</span> Model Fit</h3>
+<p>In the previous section, we focused on assessing the accuracy of individual coefficient estimates - asking whether each specific predictor is significantly related to the response. Now we shift our perspective and ask a broader question: <em>how well does the model as a whole fit the data? In other words, once we have estimated our regression equation, how good is it at capturing the actual patterns in student exam scores? Is the model useful, or does it leave too much unexplained?</em></p>
+<p>To answer these questions, we rely on three complementary statistics that appear at the bottom of every regression summary in R: the Residual Standard Error (RSE), the <span class="math inline">\(R^2\)</span> statistic, and the F-statistic. Each of these measures provides a different lens through which to evaluate the overall quality of the model, and together they give us a well-rounded picture of model performance.</p>
+<p>The <strong>Residual Standard Error</strong> is perhaps the most intuitive measure of model accuracy, because it is expressed in the same units as the response variable. It estimates the standard deviation of the error term <span class="math inline">\(\epsilon\)</span> - that is, it tells us the typical size of the prediction errors our model makes. The RSE is computed using the formula:</p>
+<p><span class="math inline">\(RSE = \sqrt{\frac{RSS}{n - p - 1}}\)</span></p>
+<p>where RSS is the residual sum of squares (the sum of all squared residuals), n is the number of observations, and p is the number of predictors. The denominator uses n − p − 1 rather than simply n because we have used up p + 1 degrees of freedom in estimating the intercept and the p slope coefficients. This correction ensures that the RSE is an unbiased estimate of the true error standard deviation <span class="math inline">\(\sigma\)</span>. The concept of degrees of freedom can be understood intuitively: each parameter we estimate “uses up” one piece of information from the data, leaving fewer independent pieces of information available to estimate the error variance. In our simple regression with one predictor, the degrees of freedom are 6,607 − 1 − 1 = 6,605. In our multiple regression with six predictors, the degrees of freedom are 6,607 − 6 − 1 = 6,600.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>sigma</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3.483406</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>sigma</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.467039</code></pre>
+</div>
+</div>
+<p>In our simple regression model, the RSE is 3.483. This means that, on average, the actual exam scores deviate from the scores predicted by the model by approximately 3.48 points. Given that the mean exam score in our dataset is 67.24, we can express this as a percentage error of about 5.18% (3.483 / 67.24 × 100). Whether this level of error is acceptable depends entirely on the context of the research. In educational research, where human behavior is inherently variable and influenced by countless unmeasured factors like test-day anxiety, mood, or the specific questions that happened to appear on the exam, a prediction error of about 3.5 points may be considered quite reasonable. However, from a pure prediction standpoint, it also tells us that our simple model leaves a lot of room for improvement - knowing only how many hours a student studies does not allow us to predict their exam score with great precision.</p>
+<p>In our multiple regression model, the RSE drops to 2.467. This represents a substantial improvement over the simple model - the average prediction error has decreased by about 29%, from 3.48 to 2.47 points. The percentage error relative to the mean is now approximately 3.67% (2.467 / 67.24 × 100). This decrease makes intuitive sense: by adding attendance, previous scores, tutoring sessions, and physical activity to the model, we have incorporated additional information that helps explain why some students score higher than others. The model now captures more of the systematic patterns in the data, leaving less to the error term. It is worth noting, however, that the RSE can never reach zero unless our model perfectly predicts every single observation, which is essentially impossible with real-world data involving human behavior. There will always be some irreducible error that no model can eliminate.</p>
+<p>The RSE also plays a foundational role in the other inference tools we discussed earlier. Recall that the standard errors of the coefficient estimates depend on the RSE - a smaller RSE leads to smaller standard errors, which in turn leads to larger t-statistics and smaller p-values. This is exactly what we observed when comparing our two models: the multiple model had a smaller RSE, which produced more precise coefficient estimates and stronger evidence of statistical significance for the predictors that truly matter.</p>
+<p>One important limitation of the RSE is that it is measured in the units of the response variable (exam points in our case), which makes it difficult to compare across different studies or datasets with different response scales. If another researcher studied a test scored on a scale of 0 to 500, their RSE would naturally be much larger in absolute terms, even if their model were proportionally just as accurate as ours. This limitation motivates the need for a scale-independent measure of model fit, which is exactly what the R² statistic provides.</p>
+<p>The <strong><span class="math inline">\(R^2\)</span></strong> statistic, also known as the coefficient of determination, is one of the most commonly reported measures of model fit in applied research. Unlike the RSE, <span class="math inline">\(R^2\)</span> is a proportion that always takes a value between 0 and 1, making it easy to interpret and compare across studies regardless of the scale of the response variable. <span class="math inline">\(R^2\)</span> answers a very specific question: <em>what fraction of the total variation in the response variable is explained by the model?</em> To understand <span class="math inline">\(R^2\)</span>, we need to consider two quantities.</p>
+<p>The first is the <strong>Total Sum of Squares</strong> (TSS), defined as:</p>
+<p><span class="math inline">\(TSS = \sum(y_i - \hat{y})^2\)</span></p>
+<p>This measures the total variability in the response variable before any regression is performed. It is simply the sum of the squared deviations of each observed exam score from the overall mean exam score. In our dataset, this captures the full extent to which students’ exam scores differ from one another. Some of this variation is systematic - driven by factors like study habits, attendance, and ability - and some of it is random noise.</p>
+<p>The second quantity is the <strong>Residual Sum of Squares</strong> (RSS), which we have already encountered:</p>
+<p><span class="math inline">\(RSS = \sum(y_i - \hat{y}_i)^2\)</span></p>
+<p>This measures the variability that remains unexplained after fitting the regression model. It is the sum of the squared residuals - the squared differences between the actual exam scores and the scores predicted by the model.</p>
+<p>The <span class="math inline">\(R^2\)</span> statistic is then defined as:</p>
+<p><span class="math inline">\(R^2 = \frac{(TSS - RSS)}{TSS} = 1 - \frac{RSS}{TSS}\)</span></p>
+<p>The numerator, TSS - RSS, represents the amount of variability in the response that is explained by the regression - it is the reduction in prediction error achieved by using the model instead of simply predicting the mean for every student. Dividing by TSS converts this into a proportion.</p>
+<p>When <span class="math inline">\(R^2\)</span> is close to 1, it means that the model explains nearly all of the variation in the response, and the RSS is very small compared to the TSS. In such a case, the predicted values <span class="math inline">\(\hat{y}_i\)</span> are very close to the actual values <span class="math inline">\(y_i\)</span>, and the model provides an excellent fit. When <span class="math inline">\(R^2\)</span> is close to 0, the model explains very little of the variation, and using the model is hardly better than simply predicting the mean exam score for every student.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>r.squared</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1984301</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>r.squared</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5982496</code></pre>
+</div>
+</div>
+<p>In our simple regression model, <span class="math inline">\(R^2\)</span> is 0.1984. This tells us that Hours_Studied alone explains approximately 19.84% of the total variation in exam scores. In other words, about one-fifth of the differences in exam scores among students can be attributed to differences in how many hours they study. This is a meaningful finding - it confirms that study time matters - but it also reveals that roughly 80% of the variation is driven by other factors not captured in this simple model.</p>
+<p>In our multiple regression model, <span class="math inline">\(R^2\)</span> jumps to 0.5982. Now the model explains approximately 59.82% of the variation in exam scores. This is a dramatic improvement - by adding attendance, previous scores, tutoring sessions, and physical activity as predictors alongside study hours, we have nearly tripled the proportion of explained variance. The remaining approximately 40% of the variation is still unexplained, presumably due to factors that are not included as quantitative predictors in this model - things like motivation level, family income, teacher quality, peer influence, and other qualitative variables in our dataset that we have not yet incorporated, as well as entirely unmeasured factors like test anxiety, the specific content of the exam, or simple luck.</p>
+<p>What constitutes a “good” <span class="math inline">\(R^2\)</span> depends heavily on the field of study. In the physical sciences, where experiments can be tightly controlled and measurement is very precise, <span class="math inline">\(R^2\)</span> values above 0.95 are common and expected. In the social sciences and education research, where human behavior is inherently noisy and influenced by a vast number of interacting factors, <span class="math inline">\(R^2\)</span> values between 0.30 and 0.60 are often considered quite good for observational studies. Our multiple model’s <span class="math inline">\(R^2\)</span> of 0.598 is therefore quite respectable for educational data - it suggests that we have identified a set of predictors that genuinely capture a large portion of what drives student performance.</p>
+<p>It is critical to understand one important caveat about <span class="math inline">\(R^2\)</span>: it will always increase (or at least never decrease) when more predictors are added to the model, even if those predictors are completely unrelated to the response. This happens because adding any variable, even a random one, gives the model more flexibility to fit the training data, and the RSS can only go down or stay the same - it can never go up. This means that a high <span class="math inline">\(R^2\)</span> does not necessarily indicate a good model; it could simply reflect the fact that many predictors have been thrown in. To guard against this problem, the <strong>Adjusted <span class="math inline">\(R^2\)</span></strong> was developed. The Adjusted <span class="math inline">\(R^2\)</span> modifies the standard <span class="math inline">\(R^2\)</span> by imposing a penalty for each additional predictor. If adding a new predictor does not reduce the RSS enough to offset the penalty for the lost degree of freedom, the Adjusted <span class="math inline">\(R^2\)</span> will actually decrease, signaling that the added predictor is not contributing meaningfully.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>adj.r.squared</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1983088</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>adj.r.squared</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5978844</code></pre>
+</div>
+</div>
+<p>In our simple model, the Adjusted <span class="math inline">\(R^2\)</span> is 0.1983, virtually identical to <span class="math inline">\(R^2\)</span> because there is only one predictor and the penalty is negligible. In our multiple model, the Adjusted <span class="math inline">\(R^2\)</span> is 0.5979, also nearly identical to the regular <span class="math inline">\(R^2\)</span> of 0.5982. The fact that the Adjusted <span class="math inline">\(R^2\)</span> barely differs from <span class="math inline">\(R^2\)</span> in the multiple model tells us that all six predictors (or at least most of them) are genuinely contributing to the model’s explanatory power - the improvement in fit is not merely an artifact of adding more variables.</p>
+<p>It is also worth noting the connection between <span class="math inline">\(R^2\)</span> and correlation. In simple linear regression, <span class="math inline">\(R^2\)</span> is exactly equal to the square of the Pearson correlation coefficient r between X and Y. In our case, <span class="math inline">\(R^2\)</span> = 0.1984 for the simple model, so the correlation between “hours_studied” and “exam_score” is <span class="math inline">\(r = \sqrt{0.1984} \approx 0.445\)</span>. In multiple regression, this simple relationship no longer holds (because there are multiple predictors), but <span class="math inline">\(R^2\)</span> can be shown to equal the squared correlation between the observed values <span class="math inline">\(y_i\)</span> and the fitted values <span class="math inline">\(\hat{y}_i\)</span>. This provides a nice intuitive interpretation: <span class="math inline">\(R^2\)</span> tells us how closely the model’s predictions track the actual outcomes.</p>
+<p>While the t-statistic and its associated p-value allow us to test whether each individual predictor is significantly related to the response, the <strong>F-statistic</strong> addresses a different and more fundamental question: <em>is the model as a whole useful?</em> Specifically, the F-statistic tests the null hypothesis that all slope coefficients in the model are simultaneously equal to zero:</p>
+<p><span class="math inline">\(H_0: \beta_1 = \beta_2 = ... = \beta_p = 0\)</span></p>
+<p>against the alternative hypothesis:</p>
+<p><span class="math inline">\(H_a\)</span>: at least one <span class="math inline">\(\beta_j\)</span> is non-zero.</p>
+<p>If the null hypothesis is true, then none of the predictors have any relationship with the response, and the model is no better than simply predicting the mean for every observation. The F-statistic is computed as:</p>
+<p><span class="math inline">\(F = \frac{\frac{TSS - RSS}{p}}{\frac{RSS}{n - p -1}}\)</span></p>
+<p>The numerator measures how much of the total variance the model explains, divided by the number of predictors p.&nbsp;The denominator measures how much variance remains unexplained, divided by the residual degrees of freedom. If the model is no better than chance, the numerator and denominator should be roughly equal, producing an F-statistic close to 1. If the model captures real patterns in the data, the numerator will be much larger than the denominator, producing a large F-statistic.</p>
+<p>One might reasonably ask: why do we need the F-statistic at all when we already have individual t-tests for each coefficient? The answer lies in the multiple testing problem. When we have many predictors, each with its own t-test, the probability of finding at least one “significant” result by pure chance increases dramatically. For example, if we tested 100 completely useless predictors at the 5% significance level, we would expect about 5 of them to appear significant purely by chance. The F-statistic avoids this problem because it is a single, omnibus test that accounts for the total number of predictors. It maintains the correct overall error rate regardless of how many predictors are in the model. So the proper approach is to first check the F-statistic to determine whether the model as a whole is significant, and only then examine the individual t-statistics to identify which specific predictors are contributing.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>fstatistic</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  value   numdf   dendf 
+1635.08    1.00 6605.00 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>fstatistic</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   value    numdf    dendf 
+1638.019    6.000 6600.000 </code></pre>
+</div>
+</div>
+<p>In our simple regression model, the F-statistic is 1,635 with 1 and 6,605 degrees of freedom, and the associated p-value is less than <span class="math inline">\(2.2 \times 10^{16}\)</span>. Since we have only one predictor in the simple model, the F-test is equivalent to the t-test for that predictor. In fact, the F-statistic in simple regression is exactly the square of the t-statistic: <span class="math inline">\(40.44^2 \approx 1,635\)</span>. The overwhelming magnitude of this F-statistic and its essentially zero p-value tell us that the model is highly significant - “hours_studied” is unquestionably related to “exam_score”.</p>
+<p>In our multiple regression model, the F-statistic is 1,638 with 6 and 6,600 degrees of freedom, and the p-value is again less than <span class="math inline">\(2.2 \times 10^{-16}\)</span>. This tests whether at least one of the six predictors is related to exam scores. The result decisively rejects the null hypothesis - the model as a whole is highly significant, and at least one (and as we saw from the individual t-tests, five out of six) predictors are genuinely related to student performance. The fact that the F-statistic is 1,638 rather than close to 1 tells us that the model explains vastly more variance than we would expect by chance alone.</p>
+<p>It is worth pausing to note an interesting detail. Even though “sleep_hours” was not individually significant (p = 0.384), the overall F-test is still overwhelmingly significant. This is entirely consistent: the F-test only requires that at least one predictor be related to the response, and the other five predictors more than satisfy this requirement. The F-test does not tell us which predictors are significant - that is the job of the individual t-tests. But it does tell us that the model as a whole is capturing real patterns.</p>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./02_00_linear_regression_model.html" class="pagination-link" aria-label="Linear Regression Model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Linear Regression Model</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Quntitative Linear Regression Model"</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> ""</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner:</span><span class="co"> "#00868B"</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner-color:</span><span class="co"> "white"</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="an">crossref:</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co">  fig-title: "Figure"</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="co">  tbl-title: "Table"</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>student_performance <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datasets/StudentPerformanceFactors.csv"</span>)</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>student_performance <span class="ot">&lt;-</span> student_performance <span class="sc">|&gt;</span></span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">Extracurricular_Activities =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>            Extracurricular_Activities <span class="sc">==</span> <span class="st">"Yes"</span> <span class="sc">~</span> <span class="cn">TRUE</span>,</span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>            Extracurricular_Activities <span class="sc">==</span> <span class="st">"No"</span> <span class="sc">~</span> <span class="cn">FALSE</span>,</span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>            <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA</span></span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">Internet_Access =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>            Internet_Access <span class="sc">==</span> <span class="st">"Yes"</span> <span class="sc">~</span> <span class="cn">TRUE</span>,</span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>            Internet_Access <span class="sc">==</span> <span class="st">"No"</span> <span class="sc">~</span> <span class="cn">FALSE</span>,</span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>            <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA</span></span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">Learning_Disabilities =</span> <span class="fu">case_when</span>(</span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>            Learning_Disabilities <span class="sc">==</span> <span class="st">"Yes"</span> <span class="sc">~</span> <span class="cn">TRUE</span>,</span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>            Learning_Disabilities <span class="sc">==</span> <span class="st">"No"</span> <span class="sc">~</span> <span class="cn">FALSE</span>,</span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>            <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA</span></span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>        <span class="at">hours_studied =</span> Hours_Studied,</span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>        <span class="at">attendance =</span> Attendance,</span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>        <span class="at">parental_involvement =</span> Parental_Involvement,</span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>        <span class="at">access_to_resources =</span> Access_to_Resources,</span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>        <span class="at">extracurricular_activities =</span> Extracurricular_Activities,</span>
+<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a>        <span class="at">sleep_hours =</span> Sleep_Hours,</span>
+<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>        <span class="at">previous_scores =</span> Previous_Scores,</span>
+<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>        <span class="at">motivation_level =</span> Motivation_Level,</span>
+<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a>        <span class="at">internet_access =</span> Internet_Access,</span>
+<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">tutoring_sessions =</span> Tutoring_Sessions,</span>
+<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>        <span class="at">family_income =</span> Family_Income,</span>
+<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>        <span class="at">teacher_quality =</span> Teacher_Quality,</span>
+<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a>        <span class="at">school_type =</span> School_Type,</span>
+<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a>        <span class="at">peer_influence =</span> Peer_Influence,</span>
+<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>        <span class="at">physical_activity =</span> Physical_Activity,</span>
+<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a>        <span class="at">learning_disabilities =</span> Learning_Disabilities,</span>
+<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a>        <span class="at">parental_education_level =</span> Parental_Education_Level,</span>
+<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>        <span class="at">distance_from_home =</span> Distance_from_Home,</span>
+<span id="cb38-58"><a href="#cb38-58" aria-hidden="true" tabindex="-1"></a>        <span class="at">gender =</span> Gender,</span>
+<span id="cb38-59"><a href="#cb38-59" aria-hidden="true" tabindex="-1"></a>        <span class="at">exam_score =</span> Exam_Score,</span>
+<span id="cb38-60"><a href="#cb38-60" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb38-61"><a href="#cb38-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-62"><a href="#cb38-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-63"><a href="#cb38-63" aria-hidden="true" tabindex="-1"></a>The simplest form of linear regression involves just one predictor variable. This is called **simple linear regression**. Mathematically, it takes the form:</span>
+<span id="cb38-64"><a href="#cb38-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-65"><a href="#cb38-65" aria-hidden="true" tabindex="-1"></a>$Y \approx \beta_0 + \beta_1X$</span>
+<span id="cb38-66"><a href="#cb38-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-67"><a href="#cb38-67" aria-hidden="true" tabindex="-1"></a>In this equation, Y is the dependent variable - the outcome we want to predict. In our example, Y is, for example, the variable "exam_score". X is the independent variable - the factor we believe is related to the outcome. For instance, X could be "hours_studied". The symbol $\beta_0$ is called the **intercept**. It represents the expected value of Y when X equals zero. In our context, it would represent the expected exam score for a hypothetical student who studies zero hours. The symbol $\beta_1$ is called the **slope**. It represents the average change in Y that is associated with a one-unit increase in X. In our example, it tells us how many additional points on the exam a student can expect to gain for each additional hour of studying. Together, $\beta_0$ and $\beta_1$ are called the **model coefficients or parameters**.</span>
+<span id="cb38-68"><a href="#cb38-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-69"><a href="#cb38-69" aria-hidden="true" tabindex="-1"></a>Of course, in real life we do not know the true values of $\beta_0$ and $\beta_1$. We must estimate them from the data. Once we have estimated these coefficients - and we denote the estimates with a hat symbol as $\hat{\beta}_0$ and $\hat{\beta}_1$ - we can write our prediction equation as: $y = \hat{\beta_0} + \hat{\beta_1}x$. Here, $\hat{y}$ is the predicted value of the response for a given value $x$ of the predictor. The hat symbol always indicates that we are dealing with an estimate rather than a true and known quantity.</span>
+<span id="cb38-70"><a href="#cb38-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-71"><a href="#cb38-71" aria-hidden="true" tabindex="-1"></a>In practice, a single predictor is rarely sufficient to explain all the variation in the response. A student's exam score is not determined by study hours alone - attendance, prior academic performance, tutoring, and many other factors play a role. **Multiple linear regression** extends the simple model to accommodate several predictors simultaneously. The general formula is:</span>
+<span id="cb38-72"><a href="#cb38-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-73"><a href="#cb38-73" aria-hidden="true" tabindex="-1"></a>$Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_pX_p + \epsilon$</span>
+<span id="cb38-74"><a href="#cb38-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-75"><a href="#cb38-75" aria-hidden="true" tabindex="-1"></a>In this equation, $X_1, X_2, X_3, ..., X_p$ represent p different predictor variables, and $\beta_1$, $\beta_2$, ..., $\beta_p$ are their corresponding slope coefficients. Each coefficient $\beta_j$ represents the average change in Y associated with a one-unit increase in the predictor $\beta_j$, while holding all other predictors constant. This "holding all other predictors constant" interpretation is crucial and is what distinguishes multiple regression from simply running many separate simple regressions. The term $\epsilon$ represents the error term - it captures everything that our model does not explain, including the influence of unmeasured variables, measurement error, and the inherent randomness in human behavior.</span>
+<span id="cb38-76"><a href="#cb38-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-77"><a href="#cb38-77" aria-hidden="true" tabindex="-1"></a>In our Student Performance example, a multiple linear regression model might look like this:</span>
+<span id="cb38-78"><a href="#cb38-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-79"><a href="#cb38-79" aria-hidden="true" tabindex="-1"></a>exam_score = $\beta_0$ + $\beta_1$ × hours_studied + $\beta_2$ × attendance + $\beta_3$ × previous_scores + $\beta_4$ × sleep_hours + $\beta_5$ × tutoring_sessions + $\beta_6$ × physical_activity + $\epsilon$</span>
+<span id="cb38-80"><a href="#cb38-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-81"><a href="#cb38-81" aria-hidden="true" tabindex="-1"></a>This model allows us to estimate the unique contribution of each predictor to the exam score. For instance, $\beta_1$ tells us the expected change in exam score for each additional hour of study, after accounting for the effects of attendance, previous scores, sleep, tutoring, and physical activity. This is fundamentally different from simple linear regression, where $\beta_1$ would capture the total association between study hours and exam scores without adjusting for any other factor.</span>
+<span id="cb38-82"><a href="#cb38-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-83"><a href="#cb38-83" aria-hidden="true" tabindex="-1"></a><span class="fu">## Estimating the Coefficients of Parameters</span></span>
+<span id="cb38-84"><a href="#cb38-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-85"><a href="#cb38-85" aria-hidden="true" tabindex="-1"></a>The key question is how do we actually find the best values for our coefficient estimates $\hat{\beta}_0$, $\hat{\beta}_1$, ..., $\hat{\beta}_p$? The answer lies in the **least squares method**, which is the most common approach for fitting a linear regression model. The basic idea is intuitive: we want our predicted values $\hat{y}_i$ to be as close as possible to the actual observed values $y_0$ for every observation in our dataset.</span>
+<span id="cb38-86"><a href="#cb38-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-87"><a href="#cb38-87" aria-hidden="true" tabindex="-1"></a>For each observation $i$, the difference between the observed value and the predicted value is called the **residual**, denoted $e_i = y_i - \hat{y}_i$. The residual tells us how much our model's prediction misses the actual outcome for that particular student. Some residuals will be positive (when the model underpredicts) and some will be negative (when the model overpredicts).</span>
+<span id="cb38-88"><a href="#cb38-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-91"><a href="#cb38-91" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-92"><a href="#cb38-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Simple Linear Regression: Exam Score ~ Hours Studied"</span></span>
+<span id="cb38-93"><a href="#cb38-93" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-align: center</span></span>
+<span id="cb38-94"><a href="#cb38-94" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb38-95"><a href="#cb38-95" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb38-96"><a href="#cb38-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb38-97"><a href="#cb38-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-98"><a href="#cb38-98" aria-hidden="true" tabindex="-1"></a>simple_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(exam_score <span class="sc">~</span> hours_studied, <span class="at">data =</span> student_performance)</span>
+<span id="cb38-99"><a href="#cb38-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-100"><a href="#cb38-100" aria-hidden="true" tabindex="-1"></a>student_performance<span class="sc">$</span>predicted <span class="ot">&lt;-</span> <span class="fu">predict</span>(simple_model)</span>
+<span id="cb38-101"><a href="#cb38-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-102"><a href="#cb38-102" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(student_performance, <span class="fu">aes</span>(<span class="at">x =</span> hours_studied, <span class="at">y =</span> exam_score)) <span class="sc">+</span></span>
+<span id="cb38-103"><a href="#cb38-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">xend =</span> hours_studied, <span class="at">yend =</span> predicted), <span class="at">color =</span> <span class="st">"grey70"</span>, <span class="at">linewidth =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb38-104"><a href="#cb38-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"#CC3333"</span>, <span class="at">size =</span> <span class="fl">1.8</span>) <span class="sc">+</span></span>
+<span id="cb38-105"><a href="#cb38-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"#3333CC"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb38-106"><a href="#cb38-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Hours Studied"</span>, <span class="at">y =</span> <span class="st">"Exam Score"</span>) <span class="sc">+</span></span>
+<span id="cb38-107"><a href="#cb38-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb38-108"><a href="#cb38-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-109"><a href="#cb38-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-110"><a href="#cb38-110" aria-hidden="true" tabindex="-1"></a>To get an overall measure of how well the model fits all the data, we cannot simply add up the residuals, because the positive and negative ones would cancel each other out. Instead, we square each residual and then sum them all up. This quantity is called the **residual sum of squares** (RSS):</span>
+<span id="cb38-111"><a href="#cb38-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-112"><a href="#cb38-112" aria-hidden="true" tabindex="-1"></a>$RSS = e_1^2 + e_2^2 + ... + e_n^2 = \sum(y_i - \hat{y}_i)^2$</span>
+<span id="cb38-113"><a href="#cb38-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-114"><a href="#cb38-114" aria-hidden="true" tabindex="-1"></a>The least squares method chooses the coefficient estimates $\hat{\beta}_0$, $\hat{\beta}_1$, ..., $\hat{\beta}_p$ that minimize this RSS. In other words, the least squares approach finds the line (in simple regression) or the hyperplane (in multiple regression) that makes the total squared prediction error as small as possible. This is a well-defined mathematical optimization problem, and the solution can be computed using calculus. For simple linear regression, the formulas for the minimizers have a closed-form expression:</span>
+<span id="cb38-115"><a href="#cb38-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-116"><a href="#cb38-116" aria-hidden="true" tabindex="-1"></a>$\hat{\beta}_1 = \frac{\sum_{i = 1}^n(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i = 1}^n(x_i - \bar{x})^2}$</span>
+<span id="cb38-117"><a href="#cb38-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-118"><a href="#cb38-118" aria-hidden="true" tabindex="-1"></a>$\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\hat{x}$</span>
+<span id="cb38-119"><a href="#cb38-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-120"><a href="#cb38-120" aria-hidden="true" tabindex="-1"></a>Here, $\bar{x}$ and $\bar{y}$ are the sample means of the predictor and the response, respectively. The formula for $\hat{\beta}_1$ has an intuitive interpretation: it measures the degree to which X and Y vary together (the numerator captures their joint variation) relative to the total variation in X (the denominator). For multiple linear regression, the coefficient estimates are computed using matrix algebra, which is handled automatically by statistical software such as R.</span>
+<span id="cb38-121"><a href="#cb38-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-122"><a href="#cb38-122" aria-hidden="true" tabindex="-1"></a>The beauty of the least squares method is that it provides a principled, objective way to estimate the model parameters. It does not require any subjective judgment about what the "best" line should look like - the method simply finds the line that minimizes the total squared distance between the observed data points and the fitted line.</span>
+<span id="cb38-123"><a href="#cb38-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-124"><a href="#cb38-124" aria-hidden="true" tabindex="-1"></a>Now let us apply these concepts to our <span class="in">`student_performance`</span> dataset. We will fit both a simple linear regression (predicting "exam_score" from "hours_studied" alone) and a multiple linear regression (predicting "exam_score" from six quantitative predictors).</span>
+<span id="cb38-125"><a href="#cb38-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-126"><a href="#cb38-126" aria-hidden="true" tabindex="-1"></a>To fit a simple linear regression model in R, we use the <span class="in">`lm()`</span> function, which stands for linear model. The syntax follows the pattern <span class="in">`lm(response ~ predictor, data = dataset)`</span>. The tilde symbol (<span class="in">`~`</span>) can be read as "*is modeled as a function of*". For our simple linear regression of "exam_score" onto "hours_studied", we write:</span>
+<span id="cb38-127"><a href="#cb38-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-130"><a href="#cb38-130" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-131"><a href="#cb38-131" aria-hidden="true" tabindex="-1"></a>simple_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb38-132"><a href="#cb38-132" aria-hidden="true" tabindex="-1"></a>    exam_score <span class="sc">~</span> hours_studied,</span>
+<span id="cb38-133"><a href="#cb38-133" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> student_performance</span>
+<span id="cb38-134"><a href="#cb38-134" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-135"><a href="#cb38-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-136"><a href="#cb38-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-137"><a href="#cb38-137" aria-hidden="true" tabindex="-1"></a>The lm() function fits the model by computing the least squares coefficient estimates. The <span class="in">`summary()`</span> function then provides a detailed output that includes the estimated coefficients, their standard errors, t-statistics, p-values, the residual standard error, and the $R^2$ statistic. The <span class="in">`confint()`</span> function computes the 95% confidence intervals for each coefficient estimate, which tell us the range of plausible values for the true population parameters.</span>
+<span id="cb38-138"><a href="#cb38-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-141"><a href="#cb38-141" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-142"><a href="#cb38-142" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)</span>
+<span id="cb38-143"><a href="#cb38-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-144"><a href="#cb38-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-145"><a href="#cb38-145" aria-hidden="true" tabindex="-1"></a>The <span class="in">`lm()`</span> function fits the model by computing the least squares coefficient estimates, and the output shows the estimated parameters of a simple linear regression model predicting exam score from hours studied. The intercept ($\hat{\beta}_0$) is estimated at 61.4570. This means that when "hours_studied" equals zero, the model predicts an exam score of approximately 61.46 points. In substantive terms, a hypothetical student who does not study at all would be expected to score about 61.5 on the exam, according to this model. This makes intuitive sense - students would still have some baseline level of knowledge from attending classes, even without additional study outside the classroom. The slope for hours_studied ($\hat{\beta}_1$) is estimated at 0.289. This is the key coefficient for our research question. It tells us that for each additional hour of study per week, a student's exam score is expected to increase by approximately 0.29 points, on average. So a student who studies 10 hours more per week than another student would be expected to score about 2.89 points higher on the exam. The direction of the relationship is positive, which aligns with our intuition that more studying leads to better performance.</span>
+<span id="cb38-146"><a href="#cb38-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-147"><a href="#cb38-147" aria-hidden="true" tabindex="-1"></a>For the multiple linear regression model, we simply add more predictors to the right side of the formula, separated by the $+$ sign:</span>
+<span id="cb38-148"><a href="#cb38-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-151"><a href="#cb38-151" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-152"><a href="#cb38-152" aria-hidden="true" tabindex="-1"></a>multiple_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb38-153"><a href="#cb38-153" aria-hidden="true" tabindex="-1"></a>    exam_score <span class="sc">~</span> hours_studied <span class="sc">+</span> attendance <span class="sc">+</span> previous_scores <span class="sc">+</span> sleep_hours <span class="sc">+</span> tutoring_sessions <span class="sc">+</span> physical_activity,</span>
+<span id="cb38-154"><a href="#cb38-154" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> student_performance</span>
+<span id="cb38-155"><a href="#cb38-155" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-156"><a href="#cb38-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-157"><a href="#cb38-157" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)</span>
+<span id="cb38-158"><a href="#cb38-158" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-159"><a href="#cb38-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-160"><a href="#cb38-160" aria-hidden="true" tabindex="-1"></a>This tells R to fit a model that predicts "exam_score" using all six quantitative predictors simultaneously. The least squares method will estimate a separate slope coefficient for each predictor, along with a single intercept, by minimizing the total RSS across all 6,607 observations. Our multiple linear regression model includes six quantitative predictors simultaneously. The estimated model can be written as:</span>
+<span id="cb38-161"><a href="#cb38-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-162"><a href="#cb38-162" aria-hidden="true" tabindex="-1"></a>Exam_Score ≈ 40.93 + 0.292 × Hours_Studied + 0.198 × Attendance + 0.048 × Previous_Scores − 0.018 × Sleep_Hours + 0.494 × Tutoring_Sessions + 0.144 × Physical_Activity</span>
+<span id="cb38-163"><a href="#cb38-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-164"><a href="#cb38-164" aria-hidden="true" tabindex="-1"></a>The intercept ($\hat{\beta}_0$) is now estimated at 40.927. This is substantially lower than in the simple model (61.46), which makes sense. In the simple model, the intercept represented the predicted score when only "hours_studied" was zero. In the multiple model, the intercept represents the predicted score when all six predictors are simultaneously zero — that is, a hypothetical student who studies zero hours, has zero attendance, has zero previous scores, gets zero sleep, has zero tutoring sessions, and does zero physical activity. Such a student is of course entirely hypothetical and unrealistic, which is why we should not over-interpret the intercept in multiple regression. Its main role is mathematical - it anchors the regression plane in the right position.</span>
+<span id="cb38-165"><a href="#cb38-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-166"><a href="#cb38-166" aria-hidden="true" tabindex="-1"></a>The coefficient for "hours_studied" is 0.292, which is remarkably similar to its value in the simple regression (0.289). This tells us something important: the relationship between study hours and exam scores is robust - it persists even after we account for the effects of attendance, prior scores, sleep, tutoring, and physical activity. In substantive terms, holding all other factors constant, each additional hour of study per week is associated with an increase of about 0.29 points on the exam.</span>
+<span id="cb38-167"><a href="#cb38-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-168"><a href="#cb38-168" aria-hidden="true" tabindex="-1"></a>The coefficient for "attendance" is 0.198, meaning that each additional percentage point of class attendance is associated with about 0.20 additional points on the exam, after controlling for the other variables. To put this in perspective, a student who attends 90% of classes versus one who attends 70% of classes (a 20 percentage-point difference) would be expected to score about 3.96 points higher, all else being equal.</span>
+<span id="cb38-169"><a href="#cb38-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-170"><a href="#cb38-170" aria-hidden="true" tabindex="-1"></a>The coefficient for "previous_scores" is 0.048. This means that for each additional point a student earned on their previous assessments, their exam score is expected to increase by about 0.048 points, holding other factors constant. A student whose prior scores are 20 points higher than another student's would be expected to score only about 0.96 points higher on this exam. This suggests that while past performance does predict future performance, its incremental contribution is small once study habits and attendance are already accounted for.</span>
+<span id="cb38-171"><a href="#cb38-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-172"><a href="#cb38-172" aria-hidden="true" tabindex="-1"></a>The coefficient for "sleep_hours" is -0.018. This is the only predictor whose coefficient is not statistically significant in this model. The negative sign suggests that more sleep is associated with slightly lower exam scores, meaning that each additional hour of sleep per night is associated with a decrease of about 0.02 points on the exam, after controlling for the other variables.</span>
+<span id="cb38-173"><a href="#cb38-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-174"><a href="#cb38-174" aria-hidden="true" tabindex="-1"></a>The coefficient for "tutoring_sessions" is 0.494, the largest individual slope coefficient in the model. Each additional tutoring session is associated with about half a point increase on the exam. A student who attended 4 tutoring sessions compared to one who attended none would be expected to score about 1.97 points higher.</span>
+<span id="cb38-175"><a href="#cb38-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-176"><a href="#cb38-176" aria-hidden="true" tabindex="-1"></a>The coefficient for physical_activity is 0.144, meaning that each additional hour per week of physical activity is associated with about 0.14 additional exam points, after controlling for the other variables.</span>
+<span id="cb38-177"><a href="#cb38-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-178"><a href="#cb38-178" aria-hidden="true" tabindex="-1"></a><span class="fu">## Accuracy of the Coefficient Estimates</span></span>
+<span id="cb38-179"><a href="#cb38-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-180"><a href="#cb38-180" aria-hidden="true" tabindex="-1"></a>In the previous section, we estimated the coefficients of our linear regression models using the least squares method. We found, for instance, that the estimated slope for "hours_studied" was 0.289 in the simple model and 0.292 in the multiple model. But a natural and critically important question follows: *How accurate are these estimates? If we collected a different sample of 6,607 students, would we get the same coefficient estimates, or would they change? And how confident can we be that the true relationship between study hours and exam scores is actually positive, rather than our estimate simply being a product of random chance in this particular sample?*</span>
+<span id="cb38-181"><a href="#cb38-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-182"><a href="#cb38-182" aria-hidden="true" tabindex="-1"></a>These questions lie at the heart of statistical inference, and the tools we use to answer them - standard errors, confidence intervals, t-statistics, and p-values - are among the most important concepts in all of applied statistics. To understand these tools, we must first understand the concept of the error term and the distinction between the population regression line and our estimated regression line.</span>
+<span id="cb38-183"><a href="#cb38-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-184"><a href="#cb38-184" aria-hidden="true" tabindex="-1"></a>When we write the linear regression model as $Y = \beta_0 + \beta_1X + \epsilon$, we are making a statement about the true, underlying relationship between X and Y in the entire population - not just in our particular sample. The coefficients $\beta_0$ and $\beta_1$ are the true population parameters, which we will never know exactly. The term $\epsilon$ is the error term, and it represents everything that our model fails to capture. There are several reasons why the error term exists.</span>
+<span id="cb38-185"><a href="#cb38-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-186"><a href="#cb38-186" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>First, the true relationship between the predictor and the response may not be perfectly linear - there may be curvature or other patterns that a straight line cannot capture.</span>
+<span id="cb38-187"><a href="#cb38-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-188"><a href="#cb38-188" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Second, there may be other variables that influence the response but are not included in our model.</span>
+<span id="cb38-189"><a href="#cb38-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-190"><a href="#cb38-190" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Third, there is always some inherent randomness and measurement error in any data we collect.</span>
+<span id="cb38-191"><a href="#cb38-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-192"><a href="#cb38-192" aria-hidden="true" tabindex="-1"></a>The error term absorbs all of these sources of discrepancy between what our model predicts and what actually happens.</span>
+<span id="cb38-193"><a href="#cb38-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-194"><a href="#cb38-194" aria-hidden="true" tabindex="-1"></a>In our <span class="in">`student_performance`</span> example, even if we knew the exact true values of $\beta_0$ and $\beta_1$ for the relationship between "hours_studied" and "exam_score" in the entire population of all students, we still could not predict any individual student's exam score perfectly. Some students who study 20 hours per week will score higher than the regression line predicts, and others will score lower. These deviations are captured by $\epsilon$. We typically assume that the error term has a mean of zero (meaning the model does not systematically overpredict or underpredict), that the errors for different observations are independent of each other, and that the errors have a constant variance $\sigma^2$ across all values of X.</span>
+<span id="cb38-195"><a href="#cb38-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-196"><a href="#cb38-196" aria-hidden="true" tabindex="-1"></a>The true population regression line, $Y = \beta_0 + \beta_1X$, represents the best linear summary of the relationship between X and Y in the entire population. Our estimated regression line, $\hat{y} = \hat{\beta}_0 + \hat{\beta}_1x$, is our best approximation of this population line based on the data we have. The key insight is that $\hat{\beta}_0$ and $\hat{\beta}_1$ are estimates of the true parameters, computed from one particular sample. If we were to draw a different random sample of 6,607 students, we would get slightly different estimates. This variability across samples is what motivates the need for standard errors, confidence intervals, and hypothesis tests - they allow us to quantify how much uncertainty surrounds our estimates.</span>
+<span id="cb38-197"><a href="#cb38-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-198"><a href="#cb38-198" aria-hidden="true" tabindex="-1"></a><span class="fu">### Standard Errors</span></span>
+<span id="cb38-199"><a href="#cb38-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-200"><a href="#cb38-200" aria-hidden="true" tabindex="-1"></a>The **standard error** of a coefficient estimate measures how much that estimate would vary if we repeatedly drew new samples from the same population and re-estimated the model each time. In other words, it quantifies the precision of our estimate. A small standard error means that our estimate is very precise - different samples would give us very similar coefficient values. A large standard error means that our estimate is imprecise - it might change substantially from sample to sample.</span>
+<span id="cb38-201"><a href="#cb38-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-202"><a href="#cb38-202" aria-hidden="true" tabindex="-1"></a>The standard error of the intercept and the slope coefficients in simple linear regression is given by the formulas:</span>
+<span id="cb38-203"><a href="#cb38-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-204"><a href="#cb38-204" aria-hidden="true" tabindex="-1"></a>$SE(\hat{\beta}_0) = \sigma^2 [\frac{1}{n} + \frac{\bar{x}^2}{\sum_{i =1}^n(x_i - \bar{x})^2}]$</span>
+<span id="cb38-205"><a href="#cb38-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-206"><a href="#cb38-206" aria-hidden="true" tabindex="-1"></a>$SE(\hat{\beta}_1) = \frac{\sigma}{\sum_{i=1}^n(x_i - \bar{x})^2}$</span>
+<span id="cb38-207"><a href="#cb38-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-208"><a href="#cb38-208" aria-hidden="true" tabindex="-1"></a>This formulas reveals two important things. First, the standard error depends on $\sigma$, the standard deviation of the error term. If there is a lot of noise in the data (large $\sigma$), then the estimated slope will be less precise, because the true signal is harder to detect amid the noise. Second, the standard error depends on the spread of the predictor values. When the $x_i$ values are more spread out (that is, when $\sum_{i=1}^n(x_i - \bar{x})^2$ is large), the standard error is smaller. Intuitively, this makes sense: if we observe students who study anywhere from 1 to 44 hours per week, we have a much better basis for estimating the slope than if all students studied between 19 and 21 hours. A wider range of predictor values gives us more "leverage" to pin down the relationship. In practice, the true value of $\sigma$ is unknown and must be estimated from the data. This estimate is the Residual Standard Error.</span>
+<span id="cb38-209"><a href="#cb38-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-212"><a href="#cb38-212" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-213"><a href="#cb38-213" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>coefficients[, <span class="st">"Std. Error"</span>]</span>
+<span id="cb38-214"><a href="#cb38-214" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>coefficients[, <span class="st">"Std. Error"</span>]</span>
+<span id="cb38-215"><a href="#cb38-215" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-216"><a href="#cb38-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-217"><a href="#cb38-217" aria-hidden="true" tabindex="-1"></a>Looking at our simple regression output, the standard error for the "hours_studied" coefficient is 0.00715. This is very small relative to the coefficient estimate of 0.289, which tells us that our estimate is highly precise. The reason for this high precision is our large sample size (6,607 observations) combined with a good spread in study hours (ranging from 1 to 44). In the multiple regression model, the standard error for "hours_studied" is even smaller at 0.00507. This decrease occurs because the multiple model has a lower RSE (2.467 compared to 3.483), which means there is less unexplained noise once we account for the additional predictors - and less noise translates directly into more precise coefficient estimates.</span>
+<span id="cb38-218"><a href="#cb38-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-219"><a href="#cb38-219" aria-hidden="true" tabindex="-1"></a>The standard errors for the other coefficients in the multiple model tell a similar story. "attendance" has a standard error of 0.00263, "previous_scores" has 0.00211, "sleep_hours" has 0.0207, "tutoring_sessions" has 0.0247, and "physical_activity" has 0.0294. Notice that "sleep_hours" has a relatively large standard error compared to its coefficient estimate (-0.018), which foreshadows the fact that this coefficient will not be statistically significant - the estimate is so imprecise relative to its magnitude that we cannot confidently distinguish it from zero.</span>
+<span id="cb38-220"><a href="#cb38-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-221"><a href="#cb38-221" aria-hidden="true" tabindex="-1"></a>A **confidence interval** provides a range of plausible values for the true population parameter. The 95% confidence interval for a regression coefficient is constructed using the formula:</span>
+<span id="cb38-222"><a href="#cb38-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-223"><a href="#cb38-223" aria-hidden="true" tabindex="-1"></a>$\hat{\beta}_j \pm 2 \times SE(\hat{\beta}_j)$</span>
+<span id="cb38-224"><a href="#cb38-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-225"><a href="#cb38-225" aria-hidden="true" tabindex="-1"></a>More precisely, the multiplier is not exactly 2 but rather the 97.5th percentile of the t-distribution with n − p − 1 degrees of freedom, where n is the sample size and p is the number of predictors. For large samples like ours (n = 6,607), this value is very close to 1.96, which is approximately 2. The interpretation of a 95% confidence interval is as follows: if we were to repeat the study many times, drawing a new random sample each time and computing a 95% confidence interval from each sample, then 95% of those intervals would contain the true population parameter. It is important to note that this does not mean there is a 95% probability that the true parameter lies within our specific interval - the true parameter is a fixed (though unknown) value, not a random quantity. Rather, the 95% refers to the long-run reliability of the procedure.</span>
+<span id="cb38-226"><a href="#cb38-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-229"><a href="#cb38-229" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-230"><a href="#cb38-230" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(simple_model)</span>
+<span id="cb38-231"><a href="#cb38-231" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-232"><a href="#cb38-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-233"><a href="#cb38-233" aria-hidden="true" tabindex="-1"></a>Let us examine the confidence intervals from our outputs. In the simple regression, the 95% confidence interval for the "hours_studied" coefficient is <span class="co">[</span><span class="ot">0.275, 0.303</span><span class="co">]</span>. This interval is narrow, reflecting the high precision of our estimate, and it lies entirely above zero. We can therefore state with 95% confidence that the true effect of one additional hour of study falls somewhere between 0.275 and 0.303 points on the exam. The fact that zero is not included in this interval is directly connected to our ability to reject the null hypothesis that the coefficient is zero - which brings us to hypothesis testing.</span>
+<span id="cb38-234"><a href="#cb38-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-237"><a href="#cb38-237" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-238"><a href="#cb38-238" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(multiple_model)</span>
+<span id="cb38-239"><a href="#cb38-239" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-240"><a href="#cb38-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-241"><a href="#cb38-241" aria-hidden="true" tabindex="-1"></a>In the multiple regression, the confidence intervals are similarly informative. For "attendance", the interval is <span class="co">[</span><span class="ot">0.193, 0.203</span><span class="co">]</span>, meaning we are 95% confident that each additional percentage point of attendance is associated with between 0.19 and 0.20 additional exam points, after controlling for the other predictors. For "tutoring_sessions", the interval is <span class="co">[</span><span class="ot">0.445, 0.542</span><span class="co">]</span>, and for "physical_activity" it is <span class="co">[</span><span class="ot">0.086, 0.202</span><span class="co">]</span> - all comfortably above zero. The critical case is "sleep_hours", whose confidence interval is <span class="co">[</span><span class="ot">-0.059, 0.023</span><span class="co">]</span>. Because this interval spans from a negative value to a positive value, crossing zero in the middle, we cannot determine whether the true effect of sleep hours on exam scores is positive, negative, or simply zero. This is exactly what it means for a coefficient to be statistically non-significant.</span>
+<span id="cb38-242"><a href="#cb38-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-243"><a href="#cb38-243" aria-hidden="true" tabindex="-1"></a><span class="fu">### Hypothesis Testing and the t-Statistic</span></span>
+<span id="cb38-244"><a href="#cb38-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-245"><a href="#cb38-245" aria-hidden="true" tabindex="-1"></a>**Hypothesis testing** provides a formal framework for determining whether the relationship we observe in our sample is likely to reflect a real relationship in the population, or whether it could plausibly be due to random chance. In the context of linear regression, the most common hypothesis test for each coefficient is:</span>
+<span id="cb38-246"><a href="#cb38-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-247"><a href="#cb38-247" aria-hidden="true" tabindex="-1"></a>**The null hypothesis ($H_0$):** $\beta_j = 0$, meaning there is no relationship between the predictor $X_j$ and the response Y.</span>
+<span id="cb38-248"><a href="#cb38-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-249"><a href="#cb38-249" aria-hidden="true" tabindex="-1"></a>**The alternative hypothesis ($H_a$):** $\beta_j \neq 0$, meaning there is some relationship between the predictor $X_j$ and the response Y.</span>
+<span id="cb38-250"><a href="#cb38-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-251"><a href="#cb38-251" aria-hidden="true" tabindex="-1"></a>If the null hypothesis is true and the predictor truly has no effect on the response, then the true slope is zero, and any non-zero slope we estimate from our sample is simply due to random noise. The t-statistic allows us to assess how likely this scenario is.</span>
+<span id="cb38-252"><a href="#cb38-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-253"><a href="#cb38-253" aria-hidden="true" tabindex="-1"></a>The t-statistic is computed as:</span>
+<span id="cb38-254"><a href="#cb38-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-255"><a href="#cb38-255" aria-hidden="true" tabindex="-1"></a>$t = \frac{\hat{\beta}_j}{SE(\hat{\beta}_j)}$</span>
+<span id="cb38-256"><a href="#cb38-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-257"><a href="#cb38-257" aria-hidden="true" tabindex="-1"></a>This is simply the coefficient estimate divided by its standard error. It measures how many standard errors the coefficient estimate is away from zero. A t-statistic close to zero means that the coefficient estimate is small relative to its uncertainty, which is consistent with the null hypothesis. A t-statistic far from zero (either very positive or very negative) means that the coefficient estimate is large relative to its uncertainty, which provides evidence against the null hypothesis.</span>
+<span id="cb38-258"><a href="#cb38-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-259"><a href="#cb38-259" aria-hidden="true" tabindex="-1"></a>Under the null hypothesis, the t-statistic follows a t-distribution with n − p − 1 degrees of freedom, where n is the number of observations and p is the number of predictors. For large samples, the t-distribution is virtually identical to the standard normal distribution, so a t-statistic beyond roughly $\pm2$ is generally considered statistically significant at the 5% level, and beyond roughly $\pm2,75$ is significant at the 1% level.</span>
+<span id="cb38-260"><a href="#cb38-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-263"><a href="#cb38-263" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-264"><a href="#cb38-264" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>coefficients[, <span class="st">"t value"</span>]</span>
+<span id="cb38-265"><a href="#cb38-265" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>coefficients[, <span class="st">"t value"</span>]</span>
+<span id="cb38-266"><a href="#cb38-266" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-267"><a href="#cb38-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-268"><a href="#cb38-268" aria-hidden="true" tabindex="-1"></a>Let us look at the t-statistics from our outputs. In the simple regression model, the t-statistic for "hours_studied" is 40.44. This means the coefficient estimate is more than 40 standard errors away from zero. To put this in perspective, if study hours truly had no effect on exam scores, observing a t-statistic this large would be essentially impossible - it would be like flipping a fair coin and getting heads 40 times in a row, except far less likely even than that. This gives us overwhelming evidence that the relationship between study hours and exam scores is real.</span>
+<span id="cb38-269"><a href="#cb38-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-270"><a href="#cb38-270" aria-hidden="true" tabindex="-1"></a>In the multiple regression model, the t-statistics reveal a clear hierarchy of evidence. "attendance" has the largest t-statistic at 75.26, making it the most precisely estimated and most strongly significant predictor. "hours_studied" follows with t = 57.52, then "previous_scores" at 22.81, "tutoring_sessions" at 20.00, and "physical_activity" at 4.89. All of these are far beyond any conventional significance threshold. The exception, as we have seen, is "sleep_hours", with a t-statistic of only -0.871. This value is well within the range we would expect to see even if the true coefficient were zero - it is less than one standard error away from zero, which is entirely unremarkable.</span>
+<span id="cb38-271"><a href="#cb38-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-272"><a href="#cb38-272" aria-hidden="true" tabindex="-1"></a><span class="fu">### The p-Value</span></span>
+<span id="cb38-273"><a href="#cb38-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-274"><a href="#cb38-274" aria-hidden="true" tabindex="-1"></a>The **p-value** is the probability of observing a t-statistic as extreme as (or more extreme than) the one we actually computed, assuming that the null hypothesis is true. In other words, it answers the question: *if there were truly no relationship between this predictor and the response, how surprising would our observed result be?*</span>
+<span id="cb38-275"><a href="#cb38-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-276"><a href="#cb38-276" aria-hidden="true" tabindex="-1"></a>A small p-value (typically below 0.05, though this threshold is a convention rather than a law of nature) indicates that the observed result would be very surprising under the null hypothesis, and we therefore reject the null hypothesis in favor of the alternative. A large p-value indicates that the observed result is not particularly surprising under the null hypothesis, and we therefore fail to reject it. It is important to emphasize that "failing to reject" is not the same as "accepting" the null hypothesis - it simply means we do not have enough evidence to conclude that a relationship exists.</span>
+<span id="cb38-277"><a href="#cb38-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-280"><a href="#cb38-280" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-281"><a href="#cb38-281" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>coefficients[, <span class="st">"Pr(&gt;|t|)"</span>]</span>
+<span id="cb38-282"><a href="#cb38-282" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>coefficients[, <span class="st">"Pr(&gt;|t|)"</span>]</span>
+<span id="cb38-283"><a href="#cb38-283" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-284"><a href="#cb38-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-285"><a href="#cb38-285" aria-hidden="true" tabindex="-1"></a>In our simple regression output, the p-value for "hours_studied" is less than $2 \times 10^{-16}$, which R displays as "&lt;2e-16". This is the smallest p-value that R can represent numerically, and it is so close to zero that for all practical purposes it means the probability of observing our results by chance alone is essentially zero. The three asterisks (***) next to this p-value correspond to the highest significance level in R's coding system, indicating p &lt; 0.001.</span>
+<span id="cb38-286"><a href="#cb38-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-287"><a href="#cb38-287" aria-hidden="true" tabindex="-1"></a>In the multiple regression, the p-values for "hours_studied", "attendance", "previous_scores", and "tutoring_sessions" are all less than $2 \times 10^{-16}$, and the p-value for "physical_activity" is approximately $1.03 \times 10^{-6}$ (or about one in a million). All of these are far below any conventional significance threshold, providing overwhelming evidence that these predictors are genuinely related to exam scores.</span>
+<span id="cb38-288"><a href="#cb38-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-289"><a href="#cb38-289" aria-hidden="true" tabindex="-1"></a>The p-value for "sleep_hours", however, is 0.384. This means that if sleep hours truly had no effect on exam scores (after controlling for the other predictors), there would be about a 38.4% probability of observing a coefficient estimate as far from zero as the one we found. In other words, our observed result is entirely unsurprising under the null hypothesis - it is the kind of result we would expect to see by random chance alone roughly 38 times out of 100. We therefore have no grounds to reject the null hypothesis for "sleep_hours", and we conclude that this variable does not have a statistically significant linear relationship with exam scores in this model.</span>
+<span id="cb38-290"><a href="#cb38-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-291"><a href="#cb38-291" aria-hidden="true" tabindex="-1"></a>These four concepts - standard errors, confidence intervals, t-statistics, and p-values - are deeply interconnected and are essentially different ways of expressing the same underlying information about the precision and significance of a coefficient estimate. The standard error is the foundation: it tells us how precise our estimate is. The t-statistic is built from the standard error by dividing the estimate by its standard error, which standardizes the estimate to a common scale. The p-value is derived from the t-statistic by computing the probability of such an extreme value under the null hypothesis. And the confidence interval is constructed by adding and subtracting approximately two standard errors from the estimate. All four approaches will always lead to the same conclusion: if the p-value is below 0.05, then the t-statistic will be beyond approximately $\pm2$, and the 95% confidence interval will not include zero. Conversely, if the p-value is above 0.05, the t-statistic will be between -2 and 2, and the confidence interval will include zero.</span>
+<span id="cb38-292"><a href="#cb38-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-293"><a href="#cb38-293" aria-hidden="true" tabindex="-1"></a><span class="fu">### Model Fit</span></span>
+<span id="cb38-294"><a href="#cb38-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-295"><a href="#cb38-295" aria-hidden="true" tabindex="-1"></a>In the previous section, we focused on assessing the accuracy of individual coefficient estimates - asking whether each specific predictor is significantly related to the response. Now we shift our perspective and ask a broader question: *how well does the model as a whole fit the data? In other words, once we have estimated our regression equation, how good is it at capturing the actual patterns in student exam scores? Is the model useful, or does it leave too much unexplained?*</span>
+<span id="cb38-296"><a href="#cb38-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-297"><a href="#cb38-297" aria-hidden="true" tabindex="-1"></a>To answer these questions, we rely on three complementary statistics that appear at the bottom of every regression summary in R: the Residual Standard Error (RSE), the $R^2$ statistic, and the F-statistic. Each of these measures provides a different lens through which to evaluate the overall quality of the model, and together they give us a well-rounded picture of model performance.</span>
+<span id="cb38-298"><a href="#cb38-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-299"><a href="#cb38-299" aria-hidden="true" tabindex="-1"></a>The **Residual Standard Error** is perhaps the most intuitive measure of model accuracy, because it is expressed in the same units as the response variable. It estimates the standard deviation of the error term $\epsilon$ - that is, it tells us the typical size of the prediction errors our model makes. The RSE is computed using the formula:</span>
+<span id="cb38-300"><a href="#cb38-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-301"><a href="#cb38-301" aria-hidden="true" tabindex="-1"></a>$RSE = \sqrt{\frac{RSS}{n - p - 1}}$</span>
+<span id="cb38-302"><a href="#cb38-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-303"><a href="#cb38-303" aria-hidden="true" tabindex="-1"></a>where RSS is the residual sum of squares (the sum of all squared residuals), n is the number of observations, and p is the number of predictors. The denominator uses n − p − 1 rather than simply n because we have used up p + 1 degrees of freedom in estimating the intercept and the p slope coefficients. This correction ensures that the RSE is an unbiased estimate of the true error standard deviation $\sigma$. The concept of degrees of freedom can be understood intuitively: each parameter we estimate "uses up" one piece of information from the data, leaving fewer independent pieces of information available to estimate the error variance. In our simple regression with one predictor, the degrees of freedom are 6,607 − 1 − 1 = 6,605. In our multiple regression with six predictors, the degrees of freedom are 6,607 − 6 − 1 = 6,600.</span>
+<span id="cb38-304"><a href="#cb38-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-307"><a href="#cb38-307" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-308"><a href="#cb38-308" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>sigma</span>
+<span id="cb38-309"><a href="#cb38-309" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>sigma</span>
+<span id="cb38-310"><a href="#cb38-310" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-311"><a href="#cb38-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-312"><a href="#cb38-312" aria-hidden="true" tabindex="-1"></a>In our simple regression model, the RSE is 3.483. This means that, on average, the actual exam scores deviate from the scores predicted by the model by approximately 3.48 points. Given that the mean exam score in our dataset is 67.24, we can express this as a percentage error of about 5.18% (3.483 / 67.24 × 100). Whether this level of error is acceptable depends entirely on the context of the research. In educational research, where human behavior is inherently variable and influenced by countless unmeasured factors like test-day anxiety, mood, or the specific questions that happened to appear on the exam, a prediction error of about 3.5 points may be considered quite reasonable. However, from a pure prediction standpoint, it also tells us that our simple model leaves a lot of room for improvement - knowing only how many hours a student studies does not allow us to predict their exam score with great precision.</span>
+<span id="cb38-313"><a href="#cb38-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-314"><a href="#cb38-314" aria-hidden="true" tabindex="-1"></a>In our multiple regression model, the RSE drops to 2.467. This represents a substantial improvement over the simple model - the average prediction error has decreased by about 29%, from 3.48 to 2.47 points. The percentage error relative to the mean is now approximately 3.67% (2.467 / 67.24 × 100). This decrease makes intuitive sense: by adding attendance, previous scores, tutoring sessions, and physical activity to the model, we have incorporated additional information that helps explain why some students score higher than others. The model now captures more of the systematic patterns in the data, leaving less to the error term. It is worth noting, however, that the RSE can never reach zero unless our model perfectly predicts every single observation, which is essentially impossible with real-world data involving human behavior. There will always be some irreducible error that no model can eliminate.</span>
+<span id="cb38-315"><a href="#cb38-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-316"><a href="#cb38-316" aria-hidden="true" tabindex="-1"></a>The RSE also plays a foundational role in the other inference tools we discussed earlier. Recall that the standard errors of the coefficient estimates depend on the RSE - a smaller RSE leads to smaller standard errors, which in turn leads to larger t-statistics and smaller p-values. This is exactly what we observed when comparing our two models: the multiple model had a smaller RSE, which produced more precise coefficient estimates and stronger evidence of statistical significance for the predictors that truly matter.</span>
+<span id="cb38-317"><a href="#cb38-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-318"><a href="#cb38-318" aria-hidden="true" tabindex="-1"></a>One important limitation of the RSE is that it is measured in the units of the response variable (exam points in our case), which makes it difficult to compare across different studies or datasets with different response scales. If another researcher studied a test scored on a scale of 0 to 500, their RSE would naturally be much larger in absolute terms, even if their model were proportionally just as accurate as ours. This limitation motivates the need for a scale-independent measure of model fit, which is exactly what the R² statistic provides.</span>
+<span id="cb38-319"><a href="#cb38-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-320"><a href="#cb38-320" aria-hidden="true" tabindex="-1"></a>The **$R^2$** statistic, also known as the coefficient of determination, is one of the most commonly reported measures of model fit in applied research. Unlike the RSE, $R^2$ is a proportion that always takes a value between 0 and 1, making it easy to interpret and compare across studies regardless of the scale of the response variable. $R^2$ answers a very specific question: *what fraction of the total variation in the response variable is explained by the model?* To understand $R^2$, we need to consider two quantities.</span>
+<span id="cb38-321"><a href="#cb38-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-322"><a href="#cb38-322" aria-hidden="true" tabindex="-1"></a>The first is the **Total Sum of Squares** (TSS), defined as:</span>
+<span id="cb38-323"><a href="#cb38-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-324"><a href="#cb38-324" aria-hidden="true" tabindex="-1"></a>$TSS = \sum(y_i - \hat{y})^2$</span>
+<span id="cb38-325"><a href="#cb38-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-326"><a href="#cb38-326" aria-hidden="true" tabindex="-1"></a>This measures the total variability in the response variable before any regression is performed. It is simply the sum of the squared deviations of each observed exam score from the overall mean exam score. In our dataset, this captures the full extent to which students' exam scores differ from one another. Some of this variation is systematic - driven by factors like study habits, attendance, and ability - and some of it is random noise.</span>
+<span id="cb38-327"><a href="#cb38-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-328"><a href="#cb38-328" aria-hidden="true" tabindex="-1"></a>The second quantity is the **Residual Sum of Squares** (RSS), which we have already encountered:</span>
+<span id="cb38-329"><a href="#cb38-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-330"><a href="#cb38-330" aria-hidden="true" tabindex="-1"></a>$RSS = \sum(y_i - \hat{y}_i)^2$</span>
+<span id="cb38-331"><a href="#cb38-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-332"><a href="#cb38-332" aria-hidden="true" tabindex="-1"></a>This measures the variability that remains unexplained after fitting the regression model. It is the sum of the squared residuals - the squared differences between the actual exam scores and the scores predicted by the model.</span>
+<span id="cb38-333"><a href="#cb38-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-334"><a href="#cb38-334" aria-hidden="true" tabindex="-1"></a>The $R^2$ statistic is then defined as:</span>
+<span id="cb38-335"><a href="#cb38-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-336"><a href="#cb38-336" aria-hidden="true" tabindex="-1"></a>$R^2 = \frac{(TSS - RSS)}{TSS} = 1 - \frac{RSS}{TSS}$</span>
+<span id="cb38-337"><a href="#cb38-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-338"><a href="#cb38-338" aria-hidden="true" tabindex="-1"></a>The numerator, TSS - RSS, represents the amount of variability in the response that is explained by the regression - it is the reduction in prediction error achieved by using the model instead of simply predicting the mean for every student. Dividing by TSS converts this into a proportion.</span>
+<span id="cb38-339"><a href="#cb38-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-340"><a href="#cb38-340" aria-hidden="true" tabindex="-1"></a>When $R^2$ is close to 1, it means that the model explains nearly all of the variation in the response, and the RSS is very small compared to the TSS. In such a case, the predicted values $\hat{y}_i$ are very close to the actual values $y_i$, and the model provides an excellent fit. When $R^2$ is close to 0, the model explains very little of the variation, and using the model is hardly better than simply predicting the mean exam score for every student.</span>
+<span id="cb38-341"><a href="#cb38-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-344"><a href="#cb38-344" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-345"><a href="#cb38-345" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>r.squared</span>
+<span id="cb38-346"><a href="#cb38-346" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>r.squared</span>
+<span id="cb38-347"><a href="#cb38-347" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-348"><a href="#cb38-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-349"><a href="#cb38-349" aria-hidden="true" tabindex="-1"></a>In our simple regression model, $R^2$ is 0.1984. This tells us that Hours_Studied alone explains approximately 19.84% of the total variation in exam scores. In other words, about one-fifth of the differences in exam scores among students can be attributed to differences in how many hours they study. This is a meaningful finding - it confirms that study time matters - but it also reveals that roughly 80% of the variation is driven by other factors not captured in this simple model.</span>
+<span id="cb38-350"><a href="#cb38-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-351"><a href="#cb38-351" aria-hidden="true" tabindex="-1"></a>In our multiple regression model, $R^2$ jumps to 0.5982. Now the model explains approximately 59.82% of the variation in exam scores. This is a dramatic improvement - by adding attendance, previous scores, tutoring sessions, and physical activity as predictors alongside study hours, we have nearly tripled the proportion of explained variance. The remaining approximately 40% of the variation is still unexplained, presumably due to factors that are not included as quantitative predictors in this model - things like motivation level, family income, teacher quality, peer influence, and other qualitative variables in our dataset that we have not yet incorporated, as well as entirely unmeasured factors like test anxiety, the specific content of the exam, or simple luck.</span>
+<span id="cb38-352"><a href="#cb38-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-353"><a href="#cb38-353" aria-hidden="true" tabindex="-1"></a>What constitutes a "good" $R^2$ depends heavily on the field of study. In the physical sciences, where experiments can be tightly controlled and measurement is very precise, $R^2$ values above 0.95 are common and expected. In the social sciences and education research, where human behavior is inherently noisy and influenced by a vast number of interacting factors, $R^2$ values between 0.30 and 0.60 are often considered quite good for observational studies. Our multiple model's $R^2$ of 0.598 is therefore quite respectable for educational data - it suggests that we have identified a set of predictors that genuinely capture a large portion of what drives student performance.</span>
+<span id="cb38-354"><a href="#cb38-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-355"><a href="#cb38-355" aria-hidden="true" tabindex="-1"></a>It is critical to understand one important caveat about $R^2$: it will always increase (or at least never decrease) when more predictors are added to the model, even if those predictors are completely unrelated to the response. This happens because adding any variable, even a random one, gives the model more flexibility to fit the training data, and the RSS can only go down or stay the same - it can never go up. This means that a high $R^2$ does not necessarily indicate a good model; it could simply reflect the fact that many predictors have been thrown in. To guard against this problem, the **Adjusted $R^2$** was developed. The Adjusted $R^2$ modifies the standard $R^2$ by imposing a penalty for each additional predictor. If adding a new predictor does not reduce the RSS enough to offset the penalty for the lost degree of freedom, the Adjusted $R^2$ will actually decrease, signaling that the added predictor is not contributing meaningfully.</span>
+<span id="cb38-356"><a href="#cb38-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-359"><a href="#cb38-359" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-360"><a href="#cb38-360" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>adj.r.squared</span>
+<span id="cb38-361"><a href="#cb38-361" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>adj.r.squared</span>
+<span id="cb38-362"><a href="#cb38-362" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-363"><a href="#cb38-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-364"><a href="#cb38-364" aria-hidden="true" tabindex="-1"></a>In our simple model, the Adjusted $R^2$ is 0.1983, virtually identical to $R^2$ because there is only one predictor and the penalty is negligible. In our multiple model, the Adjusted $R^2$ is 0.5979, also nearly identical to the regular $R^2$ of 0.5982. The fact that the Adjusted $R^2$ barely differs from $R^2$ in the multiple model tells us that all six predictors (or at least most of them) are genuinely contributing to the model's explanatory power - the improvement in fit is not merely an artifact of adding more variables.</span>
+<span id="cb38-365"><a href="#cb38-365" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-366"><a href="#cb38-366" aria-hidden="true" tabindex="-1"></a>It is also worth noting the connection between $R^2$ and correlation. In simple linear regression, $R^2$ is exactly equal to the square of the Pearson correlation coefficient r between X and Y. In our case, $R^2$ = 0.1984 for the simple model, so the correlation between "hours_studied" and "exam_score" is $r = \sqrt{0.1984} \approx 0.445$. In multiple regression, this simple relationship no longer holds (because there are multiple predictors), but $R^2$ can be shown to equal the squared correlation between the observed values $y_i$ and the fitted values $\hat{y}_i$. This provides a nice intuitive interpretation: $R^2$ tells us how closely the model's predictions track the actual outcomes.</span>
+<span id="cb38-367"><a href="#cb38-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-368"><a href="#cb38-368" aria-hidden="true" tabindex="-1"></a>While the t-statistic and its associated p-value allow us to test whether each individual predictor is significantly related to the response, the **F-statistic** addresses a different and more fundamental question: *is the model as a whole useful?* Specifically, the F-statistic tests the null hypothesis that all slope coefficients in the model are simultaneously equal to zero:</span>
+<span id="cb38-369"><a href="#cb38-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-370"><a href="#cb38-370" aria-hidden="true" tabindex="-1"></a>$H_0: \beta_1 = \beta_2 = ... = \beta_p = 0$</span>
+<span id="cb38-371"><a href="#cb38-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-372"><a href="#cb38-372" aria-hidden="true" tabindex="-1"></a>against the alternative hypothesis:</span>
+<span id="cb38-373"><a href="#cb38-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-374"><a href="#cb38-374" aria-hidden="true" tabindex="-1"></a>$H_a$: at least one $\beta_j$ is non-zero.</span>
+<span id="cb38-375"><a href="#cb38-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-376"><a href="#cb38-376" aria-hidden="true" tabindex="-1"></a>If the null hypothesis is true, then none of the predictors have any relationship with the response, and the model is no better than simply predicting the mean for every observation. The F-statistic is computed as:</span>
+<span id="cb38-377"><a href="#cb38-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-378"><a href="#cb38-378" aria-hidden="true" tabindex="-1"></a>$F = \frac{\frac{TSS - RSS}{p}}{\frac{RSS}{n - p -1}}$</span>
+<span id="cb38-379"><a href="#cb38-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-380"><a href="#cb38-380" aria-hidden="true" tabindex="-1"></a>The numerator measures how much of the total variance the model explains, divided by the number of predictors p. The denominator measures how much variance remains unexplained, divided by the residual degrees of freedom. If the model is no better than chance, the numerator and denominator should be roughly equal, producing an F-statistic close to 1. If the model captures real patterns in the data, the numerator will be much larger than the denominator, producing a large F-statistic.</span>
+<span id="cb38-381"><a href="#cb38-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-382"><a href="#cb38-382" aria-hidden="true" tabindex="-1"></a>One might reasonably ask: why do we need the F-statistic at all when we already have individual t-tests for each coefficient? The answer lies in the multiple testing problem. When we have many predictors, each with its own t-test, the probability of finding at least one "significant" result by pure chance increases dramatically. For example, if we tested 100 completely useless predictors at the 5% significance level, we would expect about 5 of them to appear significant purely by chance. The F-statistic avoids this problem because it is a single, omnibus test that accounts for the total number of predictors. It maintains the correct overall error rate regardless of how many predictors are in the model. So the proper approach is to first check the F-statistic to determine whether the model as a whole is significant, and only then examine the individual t-statistics to identify which specific predictors are contributing.</span>
+<span id="cb38-383"><a href="#cb38-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-386"><a href="#cb38-386" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb38-387"><a href="#cb38-387" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simple_model)<span class="sc">$</span>fstatistic</span>
+<span id="cb38-388"><a href="#cb38-388" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multiple_model)<span class="sc">$</span>fstatistic</span>
+<span id="cb38-389"><a href="#cb38-389" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb38-390"><a href="#cb38-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-391"><a href="#cb38-391" aria-hidden="true" tabindex="-1"></a>In our simple regression model, the F-statistic is 1,635 with 1 and 6,605 degrees of freedom, and the associated p-value is less than $2.2 \times 10^{16}$. Since we have only one predictor in the simple model, the F-test is equivalent to the t-test for that predictor. In fact, the F-statistic in simple regression is exactly the square of the t-statistic: $40.44^2 \approx 1,635$. The overwhelming magnitude of this F-statistic and its essentially zero p-value tell us that the model is highly significant - "hours_studied" is unquestionably related to "exam_score".</span>
+<span id="cb38-392"><a href="#cb38-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-393"><a href="#cb38-393" aria-hidden="true" tabindex="-1"></a>In our multiple regression model, the F-statistic is 1,638 with 6 and 6,600 degrees of freedom, and the p-value is again less than $2.2 \times 10^{-16}$. This tests whether at least one of the six predictors is related to exam scores. The result decisively rejects the null hypothesis - the model as a whole is highly significant, and at least one (and as we saw from the individual t-tests, five out of six) predictors are genuinely related to student performance. The fact that the F-statistic is 1,638 rather than close to 1 tells us that the model explains vastly more variance than we would expect by chance alone.</span>
+<span id="cb38-394"><a href="#cb38-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-395"><a href="#cb38-395" aria-hidden="true" tabindex="-1"></a>It is worth pausing to note an interesting detail. Even though "sleep_hours" was not individually significant (p = 0.384), the overall F-test is still overwhelmingly significant. This is entirely consistent: the F-test only requires that at least one predictor be related to the response, and the other five predictors more than satisfy this requirement. The F-test does not tell us which predictors are significant - that is the job of the individual t-tests. But it does tell us that the model as a whole is capturing real patterns.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

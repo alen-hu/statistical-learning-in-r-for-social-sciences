@@ -1,0 +1,112 @@
+---
+title: "Linear Regression Model"
+description: ""
+number-sections: true
+title-block-banner: "#00868B"
+title-block-banner-color: "white"
+crossref:
+  fig-title: "Figure"
+  tbl-title: "Table"
+---
+
+```{r}
+#| include: false
+
+library(tidyverse)
+
+student_performance <- read_csv("datasets/StudentPerformanceFactors.csv")
+
+student_performance <- student_performance |>
+    mutate(
+        Extracurricular_Activities = case_when(
+            Extracurricular_Activities == "Yes" ~ TRUE,
+            Extracurricular_Activities == "No" ~ FALSE,
+            TRUE ~ NA
+        ),
+        Internet_Access = case_when(
+            Internet_Access == "Yes" ~ TRUE,
+            Internet_Access == "No" ~ FALSE,
+            TRUE ~ NA
+        ),
+        Learning_Disabilities = case_when(
+            Learning_Disabilities == "Yes" ~ TRUE,
+            Learning_Disabilities == "No" ~ FALSE,
+            TRUE ~ NA
+        )
+    ) |>
+    rename(
+        hours_studied = Hours_Studied,
+        attendance = Attendance,
+        parental_involvement = Parental_Involvement,
+        access_to_resources = Access_to_Resources,
+        extracurricular_activities = Extracurricular_Activities,
+        sleep_hours = Sleep_Hours,
+        previous_scores = Previous_Scores,
+        motivation_level = Motivation_Level,
+        internet_access = Internet_Access,
+        tutoring_sessions = Tutoring_Sessions,
+        family_income = Family_Income,
+        teacher_quality = Teacher_Quality,
+        school_type = School_Type,
+        peer_influence = Peer_Influence,
+        physical_activity = Physical_Activity,
+        learning_disabilities = Learning_Disabilities,
+        parental_education_level = Parental_Education_Level,
+        distance_from_home = Distance_from_Home,
+        gender = Gender,
+        exam_score = Exam_Score,
+    )
+```
+
+::: {.callout-note icon="false" collapse="true" title="Dataset: `student_performance`"}
+The `student_performance` dataset is a large educational dataset that seeks to capture the many different factors that can influence how well a student performs on their final exam. The fundamental research question behind this dataset is: *what predicts student academic achievement, and how strongly does each factor contribute?* This dataset is publicly available on the Kaggle platform, where it was published under the title (Student Performance Factors) [https://www.kaggle.com/datasets/lainguyn123/student-performance-factors]. The dataset contains 6,607 observations, where each observation represents one individual student. For each student, 20 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 19 are potential predictors (independent variables). Let us walk you through each of them:
+
+- "hours_studied" records how many hours per week each student dedicates to studying,
+
+- "attendance" represents the percentage of classes each student attended during the course,
+
+- "parental_involvement" describes the degree to which a student's parents are involved in their education within the three levels (Low, Medium, and High),
+
+- "access_to_resources" indicates the level of access a student has to educational resources such as textbooks, computers, or online materials within the three levels (Low, Medium, and High),
+
+- "extracurricular_activities" records whether the student participates in extracurricular activities (`TRUE` or `FALSE`),
+
+- "sleep_hours" records the average number of hours of sleep the student gets per night,
+
+- "previous_scores" captures the student's scores from prior academic assessments,
+
+- "motivation_level" captures the student's self-reported level of motivation within the three categories (Low, Medium, and High),
+
+- "internet_access" indicates whether the student has access to the internet (`TRUE` or `FALSE`),
+
+- "tutoring_sessions" records the number of tutoring sessions the student attended,
+
+- "family_income" records the economic status of the student's family, categorized as Low, Medium, or High,
+
+- "teacher_quality" describes the perceived quality of the student's teachers, categorized as Low, Medium, or High,
+
+- "school_type" indicates whether the student attends a public or private school,
+
+- "peer_influence" describes the nature of the influence the student's peer group has on their academic behavior, and it has three levels (Negative, Neutral, and Positive),
+
+- "physical_activity" measures how many hours per week the student spends on physical activities,
+
+- "learning_disabilities" records whether the student has been diagnosed with any learning disabilities (`TRUE` or `FALSE`),
+
+- "parental_education_level" captures the highest level of education achieved by the student's parents, with categories including High School, College, and Postgraduate.
+
+- "distance_from_home" indicates how far the student lives from their school, categorized as Near, Moderate, or Far,
+
+- "gender" records the student's gender as either Male or Female,
+
+- "exam_score" records the score that each student achieved on their final exam.
+
+```{r}
+# Pregled podataka
+glimpse(student_performance)
+```
+:::
+
+**Linear regression** is one of the oldest, most fundamental, and most widely used methods in statistics and statistical learning. Despite its simplicity, it remains an essential tool for anyone working with data, especially in the social sciences. The core idea behind linear regression is straightforward: we want to understand and quantify the relationship between one or more explanatory variables and a single outcome variable. More specifically, linear regression assumes that the relationship between the dependent and the independent variable can be described, at least approximately, by a straight line - or in the case of multiple predictors, by a flat surface (a hyperplane) in higher-dimensional space.
+
+The purpose of linear regression is twofold. First, it serves an explanatory purpose: it helps us understand which factors are associated with the outcome and how strongly each factor contributes, while holding the other factors constant. Second, it serves a predictive purpose: once we have estimated the relationship, we can use it to predict the outcome for new observations based on their predictor values. In our student performance example, the central question is: *what factors influence a student's exam score, and by how much?* Linear regression allows us to answer questions such as "*does studying more hours lead to higher exam scores?*" and "*how much additional score can a student expect to gain for each additional hour of study?*"

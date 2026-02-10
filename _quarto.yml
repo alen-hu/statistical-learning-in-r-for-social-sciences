@@ -9,7 +9,9 @@ book:
   chapters:
     - index.qmd
     - introduction_to_statistical_learning.qmd
-    - linear_regression.qmd
+    - part: 02_00_linear_regression_model.qmd
+      chapters:
+        - 02_01_quntitative_linear_regression_model.qmd
 
 bibliography: references.bib
 
