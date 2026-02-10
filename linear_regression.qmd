@@ -7,7 +7,7 @@ title-block-banner-color: "white"
 ---
 
 ```{r}
-#| echo: false
+#| include: false
 
 library(tidyverse)
 
@@ -55,9 +55,9 @@ student_performance <- student_performance |>
     )
 ```
 
-The `student_performance` dataset is a large educational dataset that seeks to capture the many different factors that can influence how well a student performs on their final exam. The fundamental research question behind this dataset is: *what predicts student academic achievement, and how strongly does each factor contribute?* This dataset is publicly available on the Kaggle platform, where it was published under the title [Student Performance Factors] (https://www.kaggle.com/datasets/lainguyn123/student-performance-factors). The dataset contains 6,607 observations, where each observation represents one individual student. For each student, 20 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 19 are potential predictors (independent variables). Let us walk you through each of them:
+The `student_performance` dataset is a large educational dataset that seeks to capture the many different factors that can influence how well a student performs on their final exam. The fundamental research question behind this dataset is: *what predicts student academic achievement, and how strongly does each factor contribute?* This dataset is publicly available on the Kaggle platform, where it was published under the title (Student Performance Factors) [https://www.kaggle.com/datasets/lainguyn123/student-performance-factors]. The dataset contains 6,607 observations, where each observation represents one individual student. For each student, 20 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 19 are potential predictors (independent variables). Let us walk you through each of them:
 
-- "hours_studied" records how many hours per week each student dedicates to studying ranged from 1 to 44 hours,
+- "hours_studied" records how many hours per week each student dedicates to studying,
 
 - "attendance" represents the percentage of classes each student attended during the course,
 
@@ -69,13 +69,13 @@ The `student_performance` dataset is a large educational dataset that seeks to c
 
 - "sleep_hours" records the average number of hours of sleep the student gets per night,
 
-- "previous_scores" captures the student's scores from prior academic assessments ranged from 50 to 100,
+- "previous_scores" captures the student's scores from prior academic assessments,
 
 - "motivation_level" captures the student's self-reported level of motivation within the three categories (Low, Medium, and High),
 
 - "internet_access" indicates whether the student has access to the internet (`TRUE` or `FALSE`),
 
-- "tutoring_sessions" records the number of tutoring sessions the student attended ranged from 0 to 8,
+- "tutoring_sessions" records the number of tutoring sessions the student attended,
 
 - "family_income" records the economic status of the student's family, categorized as Low, Medium, or High,
 
@@ -95,11 +95,11 @@ The `student_performance` dataset is a large educational dataset that seeks to c
 
 - "gender" records the student's gender as either Male or Female,
 
-- "exam_score" records the score that each student achieved on their final exam ranged from 55 to 101 points.
+- "exam_score" records the score that each student achieved on their final exam.
 
 ```{r}
 # Pregled podataka
-str(student_performance)
+glimpse(student_performance)
 ```
 
 **Linear regression** is one of the oldest, most fundamental, and most widely used methods in statistics and statistical learning. Despite its simplicity, it remains an essential tool for anyone working with data, especially in the social sciences. The core idea behind linear regression is straightforward: we want to understand and quantify the relationship between one or more explanatory variables and a single outcome variable. More specifically, linear regression assumes that the relationship between the dependent and the independent variable can be described, at least approximately, by a straight line - or in the case of multiple predictors, by a flat surface (a hyperplane) in higher-dimensional space.
