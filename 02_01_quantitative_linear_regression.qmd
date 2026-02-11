@@ -4,9 +4,6 @@ description: "This chapter explores linear regression as a core statistical meth
 number-sections: true
 title-block-banner: "#00868B"
 title-block-banner-color: "white"
-crossref:
-  fig-title: "Figure"
-  tbl-title: "Table"
 ---
 
 ```{r}

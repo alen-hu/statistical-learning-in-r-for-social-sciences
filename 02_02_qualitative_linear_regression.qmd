@@ -1,0 +1,56 @@
+---
+title: "Qualitative Linear Regression"
+description: ""
+number-sections: true
+title-block-banner: "#00868B"
+title-block-banner-color: "white"
+---
+
+```{r}
+#| include: false
+
+library(tidyverse)
+
+student_performance <- read_csv("datasets/StudentPerformanceFactors.csv")
+
+student_performance <- student_performance |>
+    mutate(
+        Extracurricular_Activities = case_when(
+            Extracurricular_Activities == "Yes" ~ TRUE,
+            Extracurricular_Activities == "No" ~ FALSE,
+            TRUE ~ NA
+        ),
+        Internet_Access = case_when(
+            Internet_Access == "Yes" ~ TRUE,
+            Internet_Access == "No" ~ FALSE,
+            TRUE ~ NA
+        ),
+        Learning_Disabilities = case_when(
+            Learning_Disabilities == "Yes" ~ TRUE,
+            Learning_Disabilities == "No" ~ FALSE,
+            TRUE ~ NA
+        )
+    ) |>
+    rename(
+        hours_studied = Hours_Studied,
+        attendance = Attendance,
+        parental_involvement = Parental_Involvement,
+        access_to_resources = Access_to_Resources,
+        extracurricular_activities = Extracurricular_Activities,
+        sleep_hours = Sleep_Hours,
+        previous_scores = Previous_Scores,
+        motivation_level = Motivation_Level,
+        internet_access = Internet_Access,
+        tutoring_sessions = Tutoring_Sessions,
+        family_income = Family_Income,
+        teacher_quality = Teacher_Quality,
+        school_type = School_Type,
+        peer_influence = Peer_Influence,
+        physical_activity = Physical_Activity,
+        learning_disabilities = Learning_Disabilities,
+        parental_education_level = Parental_Education_Level,
+        distance_from_home = Distance_from_Home,
+        gender = Gender,
+        exam_score = Exam_Score,
+    )
+```

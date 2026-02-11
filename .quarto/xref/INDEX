@@ -22,5 +22,14 @@
   },
   "02_01_quntitative_linear_regression_model.qmd": {
     "02_01_quntitative_linear_regression_model.html": "a3d6e455"
+  },
+  "02_00_linear_regression.qmd": {
+    "02_00_linear_regression.html": "e5b0cfbe"
+  },
+  "02_01_quantitative_linear_regression.qmd": {
+    "02_01_quantitative_linear_regression.html": "1e1d13f7"
+  },
+  "02_02_qualitative_linear_regression.qmd": {
+    "02_02_qualitative_linear_regression.html": "47e03d5f"
   }
 }
