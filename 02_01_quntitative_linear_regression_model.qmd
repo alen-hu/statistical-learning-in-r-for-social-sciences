@@ -1,6 +1,6 @@
 ---
-title: "Quntitative Linear Regression Model"
-description: ""
+title: "Quntitative Linear Regression"
+description: "This chapter explores linear regression as a core statistical method for modeling relationships between variables. It begins with simple linear regression, examining how a single predictor relates to an outcome, before extending to multiple linear regression, where several predictors are combined to improve explanatory power. The chapter then introduces interaction effects, showing how the relationship between a predictor and the outcome can change depending on the value of another variable. Finally, it covers hierarchical linear regression, a model-building strategy in which predictors are entered in theoretically guided blocks, allowing researchers to assess the incremental contribution of each set of variables to the explained variance. Throughout, emphasis is placed on interpretation of coefficients, model comparison, and practical application."
 number-sections: true
 title-block-banner: "#00868B"
 title-block-banner-color: "white"
@@ -62,7 +62,7 @@ The simplest form of linear regression involves just one independent variable. T
 
 $Y \approx \beta_0 + \beta_1X$
 
-In this equation, Y is the dependent variable - the outcome we want to predict. In our example, Y is, for example, the variable "exam_score". X is the independent variable - the factor we believe is related to the outcome. For instance, X could be "hours_studied". The symbol $\beta_0$ is called the **intercept**. It represents the expected value of Y when X equals zero. In our context, it would represent the expected exam score for a hypothetical student who studies zero hours. The symbol $\beta_1$ is called the **slope**. It represents the average change in Y that is associated with a one-unit increase in X. In our example, it tells us how many additional points on the exam a student can expect to gain for each additional hour of studying. Together, $\beta_0$ and $\beta_1$ are called the **model coefficients or parameters**.
+In this equation, $Y$ is the dependent variable - the outcome we want to predict. In our example, $Y$ is, for example, the variable `exam_score`. $X$ is the independent variable - the factor we believe is related to the outcome. For instance, $X$ could be `hours_studied`. The symbol $\beta_0$ is called the **intercept**. It represents the expected value of $Y$ when $X$ equals zero. In our context, it would represent the expected exam score for a hypothetical student who studies zero hours. The symbol $\beta_1$ is called the **slope**. It represents the average change in $Y$ that is associated with a one-unit increase in $X$. In our example, it tells us how many additional points on the exam a student can expect to gain for each additional hour of studying. Together, $\beta_0$ and $\beta_1$ are called the **model coefficients or parameters**.
 
 Of course, in real life we do not know the true values of $\beta_0$ and $\beta_1$. We must estimate them from the data. Once we have estimated these coefficients - and we denote the estimates with a hat symbol as $\hat{\beta}_0$ and $\hat{\beta}_1$ - we can write our prediction equation as: $y = \hat{\beta_0} + \hat{\beta_1}x$. Here, $\hat{y}$ is the predicted value of the response for a given value $x$ of the predictor. The hat symbol always indicates that we are dealing with an estimate rather than a true and known quantity.
 
@@ -70,11 +70,11 @@ In practice, a single predictor is rarely sufficient to explain all the variatio
 
 $Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + ... + \beta_pX_p + \epsilon$
 
-In this equation, $X_1$, $X_2$, $X_3$, ..., $X_p$ represent $p$ different independent variables, and $\beta_1$, $\beta_2$, ..., $\beta_p$ are their corresponding slope coefficients. Each coefficient $\beta_j$ represents the average change in Y associated with a one-unit increase in the predictor $\beta_j$, while **holding all other predictors constant** which distinguishes multiple regression from simply running many separate simple regressions. The term $\epsilon$ represents the **error term** - it captures everything that our model does not explain, including the influence of unmeasured variables, measurement error, and the inherent randomness in human behavior.
+In this equation, $X_1$, $X_2$, $X_3$, ..., $X_p$ represent $p$ different independent variables, and $\beta_1$, $\beta_2$, ..., $\beta_p$ are their corresponding slope coefficients. Each coefficient $\beta_j$ represents the average change in $Y$ associated with a one-unit increase in the predictor $\beta_j$, while **holding all other predictors constant** which distinguishes multiple regression from simply running many separate simple regressions. The term $\epsilon$ represents the **error term** - it captures everything that our model does not explain, including the influence of unmeasured variables, measurement error, and the inherent randomness in human behavior.
 
 In our student performance example, a multiple linear regression model might look like this:
 
-exam_score = $\beta_0$ + $\beta_1$ × hours_studied + $\beta_2$ × attendance + $\beta_3$ × previous_scores + $\beta_4$ × sleep_hours + $\beta_5$ × tutoring_sessions + $\beta_6$ × physical_activity + $\epsilon$
+$\text{exam_score} = \beta_0 + \beta_1 \times \text{hours_studied} + \beta_2 \times \text{attendance} + \beta_3 \times \text{previous_scores} + \beta_4 \times \text{sleep_hours} + \beta_5 \times \text{tutoring_sessions} + \beta_6 \times \text{physical_activity} + \epsilon$
 
 This model allows us to estimate the unique contribution of each predictor to the exam score. For instance, $\beta_1$ tells us the expected change in exam score for each additional hour of study, after accounting for the effects of attendance, previous scores, sleep, tutoring, and physical activity. This is fundamentally different from simple linear regression, where $\beta_1$ would capture the total association between study hours and exam scores without adjusting for any other factor.
 
@@ -85,6 +85,7 @@ The key question is how do we actually find the best values for our coefficient 
 For each observation $i$, the difference between the observed value and the predicted value is called the **residual**, denoted $e_i = y_i - \hat{y}_i$. The residual tells us how much our model's prediction misses the actual outcome for that particular student. Some residuals will be positive (when the model underpredicts) and some will be negative (when the model overpredicts).
 
 ```{r}
+#| fig.cap: "Simple Linear Regression: Exam Score ~ Hours Studied"
 #| echo: false
 #| warning: false
 #| message: false
@@ -96,11 +97,10 @@ student_performance$predicted <- predict(simple_model)
 ggplot(student_performance, aes(x = hours_studied, y = exam_score)) +
   geom_segment(aes(xend = hours_studied, yend = predicted), color = "grey70", linewidth = 0.4) +
   geom_point(color = "#00868B", size = 1.8) +
-  geom_smooth(method = "lm", se = FALSE, color = "#3333CC", linewidth = 1) +
+  geom_smooth(method = "lm", se = FALSE, color = "#EE2C2C", linewidth = 1) +
   labs(x = "Hours Studied", y = "Exam Score") +
   theme_minimal()
 ```
-: Simple Linear Regression: Exam Score ~ Hours Studied
 
 To get an overall measure of how well the model fits all the data, we cannot simply add up the residuals, because the positive and negative ones would cancel each other out. Instead, we square each residual and then sum them all up. This quantity is called the **residual sum of squares** (RSS):
 
@@ -112,32 +112,30 @@ $\hat{\beta}_0 = \bar{y} - \hat{\beta}_1\hat{x}$
 
 $\hat{\beta}_1 = \frac{\sum_{i = 1}^n(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i = 1}^n(x_i - \bar{x})^2}$
 
-Here, $\bar{x}$ and $\bar{y}$ are the sample means of the predictor and the response, respectively. The formula for $\hat{\beta}_1$ has an intuitive interpretation: it measures the degree to which X and Y vary together (the numerator captures their joint variation) relative to the total variation in X (the denominator). For multiple linear regression, the coefficient estimates are computed using matrix algebra.
+Here, $\bar{x}$ and $\bar{y}$ are the sample means of the predictor and the response, respectively. The formula for $\hat{\beta}_1$ has an intuitive interpretation: it measures the degree to which $X$ and $Y$ vary together (the numerator captures their joint variation) relative to the total variation in $X$ (the denominator). For multiple linear regression, the coefficient estimates are computed using matrix algebra.
 
-The beauty of the least squares method is that it provides a principled, objective way to estimate the model parameters. It does not require any subjective judgment about what the "best" line should look like - the method simply finds the line that minimizes the total squared distance between the observed data points and the fitted line.
+By this, hte least squares method provides a principled, objective way to estimate the model parameters. It does not require any subjective judgment about what the "best" line should look like - the method simply finds the line that minimizes the total squared distance between the observed data points and the fitted line.
 
-To fit a simple linear regression model in R, we use the `lm()` function, which stands for linear model. The syntax follows the pattern `lm(response ~ predictor, data = dataset)`. The tilde symbol (`~`) can be read as "*is modeled as a function of*". For our simple linear regression of "exam_score" onto "hours_studied", we write:
+To fit a simple linear regression model in R, we use the `lm()` function. The syntax follows the pattern `lm(response ~ predictor, data = dataset)`. The tilde symbol (`~`) can be read as "*is modeled as a function of*". The `lm()` fits the model by computing the least squares coefficient estimates, and the output shows the estimated parameters of a simple linear regression model.
+
+The `summary()` function then provides a detailed output that includes the estimated coefficients, their standard errors, t-statistics, p-values, the residual standard error, and the $R^2$ statistic. The `confint()` function computes the 95% confidence intervals for each coefficient estimate, which tell us the range of plausible values for the true population parameters.
+
+For our simple linear regression of `exam_score` onto `hours_studied`, we write:
 
 ```{r}
 simple_model <- lm(
     exam_score ~ hours_studied,
     data = student_performance
 )
-```
 
-The lm() function fits the model by computing the least squares coefficient estimates. The `summary()` function then provides a detailed output that includes the estimated coefficients, their standard errors, t-statistics, p-values, the residual standard error, and the $R^2$ statistic. The `confint()` function computes the 95% confidence intervals for each coefficient estimate, which tell us the range of plausible values for the true population parameters.
-
-```{r}
 summary(simple_model)
 ```
-
-The `lm()` fits the model by computing the least squares coefficient estimates, and the output shows the estimated parameters of a simple linear regression model predicting exam score from hours studied.
 
 ```{r}
 summary(simple_model)$coefficients[, "Estimate"]
 ```
 
-The intercept ($\hat{\beta}_0$) is estimated at 61.4570. This means that when "hours_studied" equals zero, the model predicts an exam score of approximately 61.46 points. In substantive terms, a hypothetical student who does not study at all would be expected to score about 61.5 on the exam, according to this model. This makes intuitive sense - students would still have some baseline level of knowledge from attending classes, even without additional study outside the classroom. The slope for "hours_studied" ($\hat{\beta}_1$) is estimated at 0.289. This is the key coefficient for our research question. It tells us that for each additional hour of study per week, a student's exam score is expected to increase by approximately 0.29 points, on average. So a student who studies 10 hours more per week than another student would be expected to score about 2.89 points higher on the exam.
+The intercept is estimated at 61.4570. This means that when `hours_studied` equals zero, the model predicts an exam score of approximately 61.46 points. In substantive terms, a hypothetical student who does not study at all would be expected to score about 61.5 on the exam, according to this model. This makes intuitive sense - students would still have some baseline level of knowledge from attending classes, even without additional study outside the classroom. The slope for `hours_studied` is estimated at 0.289. This is the key coefficient for our research question. It tells us that for each additional hour of study per week, a student's exam score is expected to increase by approximately 0.29 points, on average. So a student who studies 10 hours more per week than another student would be expected to score about 2.89 points higher on the exam.
 
 For the multiple linear regression model, we simply add more predictors to the right side of the formula, separated by the `+` sign:
 
@@ -150,7 +148,7 @@ multiple_model <- lm(
 summary(multiple_model)
 ```
 
-This tells R to fit a model that predicts "exam_score" using all six quantitative predictors simultaneously. The least squares method will estimate a separate slope coefficient for each predictor, along with a single intercept, by minimizing the total RSS across all 6,607 observations. Our multiple linear regression model includes six quantitative predictors simultaneously.
+This tells R to fit a model that predicts `exam_score` using all six quantitative predictors simultaneously. The least squares method will estimate a separate slope coefficient for each predictor, along with a single intercept, by minimizing the total RSS across all 6,607 observations.
 
 ```{r}
 summary(multiple_model)$coefficients[, "Estimate"]
@@ -158,33 +156,25 @@ summary(multiple_model)$coefficients[, "Estimate"]
 
 The estimated model can be written as:
 
-Exam_Score ≈ 40.93 + 0.292 × Hours_Studied + 0.198 × Attendance + 0.048 × Previous_Scores − 0.018 × Sleep_Hours + 0.494 × Tutoring_Sessions + 0.144 × Physical_Activity
+$\text{exam_score} \approx 40.93 + 0.292 \times \text{hours_studied} + 0.198 \times \text{attendance} + 0.048 \times \text{previous_scores} + 0.018 \times \text{sleep_hours} + 0.494 \times \text{tutoring_sessions} + 0.144 \times \text{pphysical_activity}$
 
-The intercept ($\hat{\beta}_0$) is now estimated at 40.927. This is substantially lower than in the simple model (61.46), which makes sense. In the simple model, the intercept represented the predicted score when only "hours_studied" was zero. In the multiple model, the intercept represents the predicted score when all six predictors are on their average value. Such a student is of course entirely hypothetical and unrealistic, which is why we should not over-interpret the intercept in multiple regression. Its main role is mathematical - it anchors the regression plane in the right position.
+The intercept is now estimated at 40.927. This is substantially lower than in the simple model (61.46), which makes sense. In the simple model, the intercept represented the predicted score when only `hours_studied` was zero. In the multiple model, the intercept represents the predicted score when all six predictors are on their average value. Such a student is of course entirely hypothetical and unrealistic, which is why we should not over-interpret the intercept in multiple regression. Its main role is mathematical - it anchors the regression plane in the right position.
 
-The coefficient for "hours_studied" is 0.292, which is remarkably similar to its value in the simple regression (0.289). This tells us something important: the relationship between study hours and exam scores is robust - it persists even after we account for the effects of attendance, prior scores, sleep, tutoring, and physical activity. In substantive terms, holding all other factors constant, each additional hour of study per week is associated with an increase of about 0.29 points on the exam.
+The coefficient for `hours_studied` is 0.292, which is remarkably similar to its value in the simple regression (0.289). This tells us something important: the relationship between study hours and exam scores is robust - it persists even after we account for the effects of attendance, prior scores, sleep, tutoring, and physical activity. In substantive terms, holding all other factors constant, each additional hour of study per week is associated with an increase of about 0.29 points on the exam.
 
-The coefficient for "attendance" is 0.198, meaning that each additional percentage point of class attendance is associated with about 0.20 additional points on the exam, after controlling for the other variables. To put this in perspective, a student who attends 90% of classes versus one who attends 70% of classes (a 20 percentage-point difference) would be expected to score about 3.96 points higher, all else being equal. The coefficient for "previous_scores" is 0.048. This means that for each additional point a student earned on their previous assessments, their exam score is expected to increase by about 0.048 points, holding other factors constant. A student whose prior scores are 20 points higher than another student's would be expected to score only about 0.96 points higher on this exam. This suggests that while past performance does predict future performance, its incremental contribution is small once study habits and attendance are already accounted for. The coefficient for "sleep_hours" is -0.018. The negative sign suggests that more sleep is associated with slightly lower exam scores, meaning that each additional hour of sleep per night is associated with a decrease of about 0.02 points on the exam, after controlling for the other variables. The coefficient for "tutoring_sessions" is 0.494, the largest individual slope coefficient in the model. Each additional tutoring session is associated with about half a point increase on the exam. The coefficient for physical_activity is 0.144, meaning that each additional hour per week of physical activity is associated with about 0.14 additional exam points, after controlling for the other variables.
+The coefficient for `attendance` is 0.198, meaning that each additional percentage point of class attendance is associated with about 0.20 additional points on the exam, after controlling for the other variables. To put this in perspective, a student who attends 90% of classes versus one who attends 70% of classes would be expected to score about 3.96 points higher, all else being equal. The coefficient for `previous_scores` is 0.048. This means that for each additional point a student earned on their previous assessments, their exam score is expected to increase by about 0.048 points, holding other factors constant. A student whose prior scores are 20 points higher than another student's would be expected to score only about 0.96 points higher on this exam. This suggests that while past performance does predict future performance, its incremental contribution is small once study habits and attendance are already accounted for. The coefficient for `sleep_hours` is -0.018. The negative sign suggests that more sleep is associated with slightly lower exam scores, meaning that each additional hour of sleep per night is associated with a decrease of about 0.02 points on the exam, after controlling for the other variables. The coefficient for `tutoring_sessions` is 0.494, the largest individual slope coefficient in the model. Each additional tutoring session is associated with about half a point increase on the exam. The coefficient for `physical_activity` is 0.144, meaning that each additional hour per week of physical activity is associated with about 0.14 additional exam points, after controlling for the other variables.
 
 ## Accuracy of the Coefficient Estimates
 
-In the previous section, we estimated the coefficients of our linear regression models using the least squares method. We found, for instance, that the estimated slope for "hours_studied" was 0.289 in the simple model and 0.292 in the multiple model. But a natural and critically important question follows: *How accurate are these estimates? If we collected a different sample of 6,607 students, would we get the same coefficient estimates, or would they change? And how confident can we be that the true relationship between study hours and exam scores is actually positive, rather than our estimate simply being a product of random chance in this particular sample?*
+In the previous section, we estimated the coefficients of our linear regression models using the least squares method. We found, for instance, that the estimated slope for `hours_studied` was 0.289 in the simple model and 0.292 in the multiple model. A natural and critically important issue that arises here concerns the accuracy of these estimates. If a different sample of 6,607 students were collected, the coefficient estimates might not remain identical but could vary due to sampling variability. This raises the broader problem of statistical uncertainty: the observed relationship between study hours and exam scores may reflect a genuine positive association in the population, yet it is also possible that the estimated effect is partly driven by random variation specific to the analyzed sample. Consequently, the reliability and inferential validity of the estimated coefficients depend on the extent to which sampling error can be ruled out as a substantive explanation of the observed effect.
 
 These questions lie at the heart of statistical inference, and the tools we use to answer them - standard errors, confidence intervals, t-statistics, and p-values - are among the most important concepts in all of applied statistics. To understand these tools, we must first understand the concept of the error term and the distinction between the population regression line and our estimated regression line.
 
-When we write the linear regression model as $Y = \beta_0 + \beta_1X + \epsilon$, we are making a statement about the true, underlying relationship between X and Y in the entire population - not just in our particular sample. The coefficients $\beta_0$ and $\beta_1$ are the true population parameters, which we will never know exactly. The term $\epsilon$ is the error term, and it represents everything that our model fails to capture. There are several reasons why the error term exists.
+When we write the linear regression model as $Y = \beta_0 + \beta_1X + \epsilon$, we are making a statement about the true, underlying relationship between $X$ and $Y$ in the entire population - not just in our particular sample. The coefficients $\beta_0$ and $\beta_1$ are the true population parameters, which we will never know exactly. The term $\epsilon$ is the error term, and it represents everything that our model fails to capture. There are several reasons why the error term exists. First, the true relationship between the predictor and the response may not be perfectly linear - there may be curvature or other patterns that a straight line cannot capture. Second, there may be other variables that influence the response but are not included in our model. Third, there is always some inherent randomness and measurement error in any data we collect. The error term absorbs all of these sources of discrepancy between what our model predicts and what actually happens.
 
-1. First, the true relationship between the predictor and the response may not be perfectly linear - there may be curvature or other patterns that a straight line cannot capture.
+In our `student_performance` example, even if we knew the exact true values of $\beta_0$ and $\beta_1$ for the relationship between `hours_studied` and `exam_score` in the entire population of all students, we still could not predict any individual student's exam score perfectly. Some students who study 20 hours per week will score higher than the regression line predicts, and others will score lower. These deviations are captured by $\epsilon$. We typically assume that the error term has a mean of zero (meaning the model does not systematically overpredict or underpredict), that the errors for different observations are independent of each other, and that the errors have a constant variance $\sigma^2$ across all values of $X$.
 
-2. Second, there may be other variables that influence the response but are not included in our model.
-
-3. Third, there is always some inherent randomness and measurement error in any data we collect.
-
-The error term absorbs all of these sources of discrepancy between what our model predicts and what actually happens.
-
-In our `student_performance` example, even if we knew the exact true values of $\beta_0$ and $\beta_1$ for the relationship between "hours_studied" and "exam_score" in the entire population of all students, we still could not predict any individual student's exam score perfectly. Some students who study 20 hours per week will score higher than the regression line predicts, and others will score lower. These deviations are captured by $\epsilon$. We typically assume that the error term has a mean of zero (meaning the model does not systematically overpredict or underpredict), that the errors for different observations are independent of each other, and that the errors have a constant variance $\sigma^2$ across all values of X.
-
-The true population regression line, $Y = \beta_0 + \beta_1X$, represents the best linear summary of the relationship between X and Y in the entire population. Our estimated regression line, $\hat{y} = \hat{\beta}_0 + \hat{\beta}_1x$, is our best approximation of this population line based on the data we have. The key insight is that $\hat{\beta}_0$ and $\hat{\beta}_1$ are estimates of the true parameters, computed from one particular sample. If we were to draw a different random sample of 6,607 students, we would get slightly different estimates. This variability across samples is what motivates the need for standard errors, confidence intervals, and hypothesis tests - they allow us to quantify how much uncertainty surrounds our estimates.
+The true population regression line, $Y = \beta_0 + \beta_1X$, represents the best linear summary of the relationship between $X$ and $Y$ in the entire population. Our estimated regression line, $\hat{y} = \hat{\beta}_0 + \hat{\beta}_1x$, is our best approximation of this population line based on the data we have. The key insight is that $\hat{\beta}_0$ and $\hat{\beta}_1$ are estimates of the true parameters, computed from one particular sample. If we were to draw a different random sample of 6,607 students, we would get slightly different estimates. This variability across samples is what motivates the need for standard errors, confidence intervals, and hypothesis tests - they allow us to quantify how much uncertainty surrounds our estimates.
 
 ### Standard Errors
 
@@ -202,39 +192,39 @@ This formulas reveals two important things. First, the standard error depends on
 summary(simple_model)$coefficients[, "Std. Error"]
 ```
 
-Looking at our simple regression output, the standard error for the "hours_studied" coefficient is 0.00715. This is very small relative to the coefficient estimate of 0.289, which tells us that our estimate is highly precise. The reason for this high precision is our large sample size combined with a good spread in study hours.
+Looking at our simple regression, the standard error for the `hours_studied` coefficient is 0.00715. This is very small relative to the coefficient estimate of 0.289, which tells us that our estimate is highly precise. The reason for this high precision is our large sample size combined with a good spread in study hours.
 
 ```{r}
 summary(multiple_model)$coefficients[, "Std. Error"]
 ```
 
-In the multiple regression model, the standard error for "hours_studied" is even smaller at 0.00507. This decrease occurs because the multiple model has a lower RSE (2.467 compared to 3.483), which means there is less unexplained noise once we account for the additional predictors - and less noise translates directly into more precise coefficient estimates. The standard errors for the other coefficients in the multiple model tell a similar story. "attendance" has a standard error of 0.00263, "previous_scores" has 0.00211, "sleep_hours" has 0.0207, "tutoring_sessions" has 0.0247, and "physical_activity" has 0.0294. Notice that "sleep_hours" has a relatively large standard error compared to its coefficient estimate (-0.018), which foreshadows the fact that this coefficient will not be statistically significant - the estimate is so imprecise relative to its magnitude that we cannot confidently distinguish it from zero.
+In the multiple regression model, the standard error for `hours_studied` is even smaller at 0.00507. This decrease occurs because the multiple model has a lower RSE, which means there is less unexplained noise once we account for the additional predictors - and less noise translates directly into more precise coefficient estimates. The standard errors for the other coefficients in the multiple model tell a similar story. `attendance` has a standard error of 0.00263, `previous_scores` has 0.00211, `sleep_hours` has 0.0207, `tutoring_sessions` has 0.0247, and `physical_activity` has 0.0294. Notice that `sleep_hours` has a relatively large standard error compared to its coefficient estimate (-0.018), which foreshadows the fact that this coefficient will not be statistically significant - the estimate is so imprecise relative to its magnitude that we cannot confidently distinguish it from zero.
 
 A **confidence interval** provides a range of plausible values for the true population parameter. The 95% confidence interval for a regression coefficient is constructed using the formula:
 
 $\hat{\beta}_j \pm 2 \times SE(\hat{\beta}_j)$
 
-More precisely, the multiplier is not exactly 2 but rather the 97.5th percentile of the t-distribution with $n - p - 1$ degrees of freedom, where n is the sample size and p is the number of predictors. For large samples like ours (n = 6,607), this value is very close to 1.96, which is approximately 2. The interpretation of a 95% confidence interval is as follows: if we were to repeat the study many times, drawing a new random sample each time and computing a 95% confidence interval from each sample, then 95% of those intervals would contain the true population parameter. It is important to note that this does not mean there is a 95% probability that the true parameter lies within our specific interval - the true parameter is a fixed value, not a random quantity. Rather, the 95% refers to the long-run reliability of the procedure.
+More precisely, the multiplier is not exactly 2 but rather the 97.5th percentile of the t-distribution with $n - p - 1$ degrees of freedom, where $n$ is the sample size and $p$ is the number of predictors. For large samples like ours, this value is very close to 1.96, which is approximately 2. The interpretation of a 95% confidence interval is as follows: if we were to repeat the study many times, drawing a new random sample each time and computing a 95% confidence interval from each sample, then 95% of those intervals would contain the true population parameter. It is important to note that this does not mean there is a 95% probability that the true parameter lies within our specific interval - the true parameter is a fixed value, not a random quantity. Rather, the 95% refers to the long-run reliability of the procedure.
 
 ```{r}
 confint(simple_model)
 ```
 
-Let us examine the confidence intervals from our outputs. In the simple regression, the 95% confidence interval for the "hours_studied" coefficient is [0.275, 0.303]. This interval is narrow, reflecting the high precision of our estimate, and it lies entirely above zero. We can therefore state with 95% confidence that the true effect of one additional hour of study falls somewhere between 0.275 and 0.303 points on the exam.
+In the simple regression, the 95% confidence interval for the `hours_studied` coefficient is [0.275, 0.303]. This interval is narrow, reflecting the high precision of our estimate, and it lies entirely above zero. We can therefore state with 95% confidence that the true effect of one additional hour of study falls somewhere between 0.275 and 0.303 points on the exam.
 
 ```{r}
 confint(multiple_model)
 ```
 
-In the multiple regression, the confidence intervals are similarly informative. For "attendance", the interval is [0.193, 0.203], meaning we are 95% confident that each additional percentage point of attendance is associated with between 0.19 and 0.20 additional exam points, after controlling for the other predictors. For "tutoring_sessions", the interval is [0.445, 0.542], and for "physical_activity" it is [0.086, 0.202] - all comfortably above zero. The critical case is "sleep_hours", whose confidence interval is [-0.059, 0.023]. Because this interval spans from a negative value to a positive value, crossing zero in the middle, we cannot determine whether the true effect of sleep hours on exam scores is positive, negative, or simply zero.
+In the multiple regression, the confidence intervals are similarly informative. For `attendance`, the interval is [0.193, 0.203], meaning we are 95% confident that each additional percentage point of attendance is associated with between 0.19 and 0.20 additional exam points, after controlling for the other predictors. For `tutoring_sessions`, the interval is [0.445, 0.542], and for `physical_activity` it is [0.086, 0.202] - all comfortably above zero. The critical case is `sleep_hours`, whose confidence interval is [-0.059, 0.023]. Because this interval spans from a negative value to a positive value, crossing zero in the middle, we cannot determine whether the true effect of sleep hours on exam scores is positive, negative, or simply zero.
 
 ### Hypothesis Testing and the t-Statistic
 
 **Hypothesis testing** provides a formal framework for determining whether the relationship we observe in our sample is likely to reflect a real relationship in the population, or whether it could plausibly be due to random chance. In linear regression, the most common hypothesis test for each coefficient is:
 
-**The null hypothesis ($H_0$):** $\beta_j = 0$, meaning there is no relationship between $X_j$ and Y.
+**The null hypothesis ($H_0$):** $\beta_j = 0$, meaning there is no relationship between $X_j$ and $Y$.
 
-**The alternative hypothesis ($H_a$):** $\beta_j \neq 0$, meaning there is some relationship between $X_j$ and Y.
+**The alternative hypothesis ($H_a$):** $\beta_j \neq 0$, meaning there is some relationship between $X_j$ and $Y$.
 
 If the null hypothesis is true and the predictor truly has no effect on the response, then the true slope is zero, and any non-zero slope we estimate from our sample is simply due to random noise. The t-statistic allows us to assess how likely this scenario is.
 
@@ -244,19 +234,19 @@ $t = \frac{\hat{\beta}_j}{SE(\hat{\beta}_j)}$
 
 This is simply the coefficient estimate divided by its standard error. It measures how many standard errors the coefficient estimate is away from zero. A t-statistic close to zero means that the coefficient estimate is small relative to its uncertainty, which is consistent with the null hypothesis. A t-statistic far from zero (either very positive or very negative) means that the coefficient estimate is large relative to its uncertainty, which provides evidence against the null hypothesis.
 
-Under the null hypothesis, the t-statistic follows a t-distribution with $n - p - 1$ degrees of freedom, where n is the number of observations and p is the number of predictors. For large samples, the t-distribution is virtually identical to the standard normal distribution, so a t-statistic beyond roughly $\pm2$ is generally considered statistically significant at the 5% level, and beyond roughly $\pm2,75$ is significant at the 1% level.
+Under the null hypothesis, the t-statistic follows a t-distribution with $n - p - 1$ degrees of freedom, where $n$ is the number of observations and $p$ is the number of predictors. For large samples, the t-distribution is virtually identical to the standard normal distribution, so a t-statistic beyond roughly $\pm2$ is generally considered statistically significant at the 5% level, and beyond roughly $\pm2,75$ at the 1% level.
 
 ```{r}
 summary(simple_model)$coefficients[, "t value"]
 ```
 
-In the simple regression model, the t-statistic for "hours_studied" is 40.44. This means the coefficient estimate is more than 40 standard errors away from zero. To put this in perspective, if study hours truly had no effect on exam scores, observing a t-statistic this large would be essentially impossible - it would be like flipping a fair coin and getting heads 40 times in a row, except far less likely even than that. This gives us overwhelming evidence that the relationship between study hours and exam scores is real.
+In the simple regression model, the t-statistic for `hours_studied` is 40.44. This means the coefficient estimate is more than 40 standard errors away from zero. To put this in perspective, if study hours truly had no effect on exam scores, observing a t-statistic this large would be essentially impossible - it would be like flipping a fair coin and getting heads 40 times in a row, except far less likely even than that. This gives us overwhelming evidence that the relationship between study hours and exam scores is real.
 
 ```{r}
 summary(multiple_model)$coefficients[, "t value"]
 ```
 
-In the multiple regression model, the t-statistics reveal a clear hierarchy of evidence. "attendance" has the largest t-statistic at 75.26, making it the most precisely estimated and most strongly significant predictor. "hours_studied" follows with t = 57.52, then "previous_scores" at 22.81, "tutoring_sessions" at 20.00, and "physical_activity" at 4.89. All of these are far beyond any conventional significance threshold. The exception, as we have seen, is "sleep_hours", with a t-statistic of only -0.871. This value is well within the range we would expect to see even if the true coefficient were zero - it is less than one standard error away from zero, which is entirely unremarkable.
+In the multiple regression model, the t-statistics reveal a clear hierarchy of evidence. `attendance` has the largest t-statistic at 75.26, making it the most precisely estimated and most strongly significant predictor. `hours_studied` follows with t = 57.52, then `previous_scores` at 22.81, `tutoring_sessions` at 20.00, and `physical_activity` at 4.89. All of these are far beyond any conventional significance threshold. The exception, as we have seen, is `sleep_hours`, with a t-statistic of only -0.871. This value is well within the range we would expect to see even if the true coefficient were zero - it is less than one standard error away from zero, which is entirely unremarkable.
 
 ### The p-Value
 
@@ -268,35 +258,35 @@ A small p-value (typically below 0.05) indicates that the observed result would 
 summary(simple_model)$coefficients[, "Pr(>|t|)"]
 ```
 
-In our simple regression output, the p-value for "hours_studied" is less than $2 \times 10^{-16}$, which R displays as "<2e-16". This is the smallest p-value that R can represent numerically, and it is so close to zero that for all practical purposes it means the probability of observing our results by chance alone is essentially zero.
+In our simple regression output, the p-value for `hours_studied` is less than $2 \times 10^{-16}$, which R displays as "<2e-16". This is the smallest p-value that R can represent numerically, and it is so close to zero that for all practical purposes it means the probability of observing our results by chance alone is essentially zero.
 
 ```{r}
 summary(multiple_model)$coefficients[, "Pr(>|t|)"]
 ```
 
-In the multiple regression, the p-values for "hours_studied", "attendance", "previous_scores", and "tutoring_sessions" are all less than $2 \times 10^{-16}$, and the p-value for "physical_activity" is approximately $1.03 \times 10^{-6}$ (or about one in a million). All of these are far below any conventional significance threshold, providing overwhelming evidence that these predictors are genuinely related to exam scores.
+In the multiple regression, the p-values for `hours_studied`, `attendance`, `previous_scores`, and `tutoring_sessions` are all less than $2 \times 10^{-16}$, and the p-value for `physical_activity` is approximately $1.03 \times 10^{-6}$ (or about one in a million). All of these are far below any conventional significance threshold, providing overwhelming evidence that these predictors are genuinely related to exam scores.
 
-The p-value for "sleep_hours", however, is 0.384. This means that if sleep hours truly had no effect on exam scores (after controlling for the other predictors), there would be about a 38.4% probability of observing a coefficient estimate as far from zero as the one we found. In other words, our observed result is entirely unsurprising under the null hypothesis - it is the kind of result we would expect to see by random chance alone roughly 38 times out of 100. We therefore have no grounds to reject the null hypothesis for "sleep_hours", and we conclude that this variable does not have a statistically significant linear relationship with exam scores in this model.
+The p-value for `sleep_hours`, however, is 0.384. This means that if sleep hours truly had no effect on exam scores, there would be about a 38.4% probability of observing a coefficient estimate as far from zero as the one we found. In other words, our observed result is entirely unsurprising under the null hypothesis - it is the kind of result we would expect to see by random chance alone roughly 38 times out of 100. We therefore have no grounds to reject the null hypothesis for `sleep_hours`, and we conclude that this variable does not have a statistically significant linear relationship with exam scores in this model.
 
 ## Model Fit
 
-In the previous section, we focused on assessing the accuracy of individual coefficient estimates - asking whether each specific predictor is significantly related to the response. Now we shift our perspective and ask a broader question: *how well does the model as a whole fit the data? In other words, once we have estimated our regression equation, how good is it at capturing the actual patterns in student exam scores? Is the model useful, or does it leave too much unexplained?*
+In the previous section, we focused on assessing the accuracy of individual coefficient estimates - asking whether each specific predictor is significantly related to the response. Now we shift our perspective and ask how well the model as a whole fits the data. In other words, we have to examine how good it is at capturing the actual patterns in student exam scores.
 
-To answer these questions, we rely on three complementary statistics that appear at the bottom of every regression summary in R: the Residual Standard Error (RSE), the $R^2$ statistic, and the F-statistic. Each of these measures provides a different lens through which to evaluate the overall quality of the model, and together they give us a well-rounded picture of model performance.
+To answer these questions, we rely on three complementary statistics that appear at the bottom of every regression summary in R: the residual standard error (RSE), the $R^2$ statistic, and the F-statistic. Each of these measures provides a different lens through which to evaluate the overall quality of the model, and together they give us a well-rounded picture of model performance.
 
 ### Residual Standard Error
 
-The **Residual Standard Error** (RSE) is perhaps the most intuitive measure of model accuracy, because it is expressed in the same units as the dependent variable. It estimates the standard deviation of the error term $\epsilon$ - that is, it tells us the typical size of the prediction errors our model makes. The RSE is computed using the formula:
+The **Residual Standard Error** (RSE) is perhaps the most intuitive measure of model accuracy, because it is expressed in the same units as the dependent variable. It estimates the standard deviation of the error term - that is, it tells us the typical size of the prediction errors our model makes. The RSE is computed using the formula:
 
 $RSE = \sqrt{\frac{RSS}{n - p - 1}}$
 
-In this formula, RSS is the residual sum of squares (the sum of all squared residuals), n is the number of observations, and p is the number of predictors. The denominator uses $n - p - 1$ rather than simply n because we have used up $p + 1$ degrees of freedom in estimating the intercept and the p slope coefficients. This correction ensures that the RSE is an unbiased estimate of the true error standard deviation $\sigma$. The concept of degrees of freedom can be understood intuitively: each parameter we estimate "uses up" one piece of information from the data, leaving fewer independent pieces of information available to estimate the error variance.
+In this formula, RSS is the residual sum of squares, $n$ is the number of observations, and $p$ is the number of predictors. The denominator uses $n - p - 1$ rather than simply $n$ because we have used up $p + 1$ degrees of freedom in estimating the intercept and the $p$ slope coefficients. This correction ensures that the RSE is an unbiased estimate of the true error standard deviation $\sigma$. The concept of degrees of freedom can be understood intuitively: each parameter we estimate "uses up" one piece of information from the data, leaving fewer independent pieces of information available to estimate the error variance.
 
 ```{r}
 summary(simple_model)$sigma
 ```
 
-In our simple regression model, the RSE is 3.483. This means that, on average, the actual exam scores deviate from the scores predicted by the model by approximately 3.48 points. Given that the mean exam score in our dataset is 67.24, we can express this as a percentage error of about 5.18% (3.483 / 67.24 × 100). Whether this level of error is acceptable depends entirely on the context of the research. In educational research, where human behavior is inherently variable and influenced by countless unmeasured factors like test-day anxiety, mood, or the specific questions that happened to appear on the exam, a prediction error of about 3.5 points may be considered quite reasonable. However, from a pure prediction standpoint, it also tells us that our simple model leaves a lot of room for improvement - knowing only how many hours a student studies does not allow us to predict their exam score with great precision.
+In our simple regression model, the RSE is 3.483. This means that, on average, the actual exam scores deviate from the scores predicted by the model by approximately 3.48 points. Given that the mean exam score in our dataset is 67.24, we can express this as a percentage error of about 5.18% (3.483 / 67.24 × 100). Whether this level of error is acceptable depends entirely on the context of the research. From a pure prediction standpoint, it also tells us that our simple model leaves a lot of room for improvement - knowing only how many hours a student studies does not allow us to predict their exam score with great precision.
 
 ```{r}
 summary(multiple_model)$sigma
@@ -304,13 +294,11 @@ summary(multiple_model)$sigma
 
 In our multiple regression model, the RSE drops to 2.467. This represents a substantial improvement over the simple model - the average prediction error has decreased by about 29%, from 3.48 to 2.47 points. The percentage error relative to the mean is now approximately 3.67% (2.467 / 67.24 × 100). This decrease makes intuitive sense: by adding attendance, previous scores, tutoring sessions, and physical activity to the model, we have incorporated additional information that helps explain why some students score higher than others. The model now captures more of the systematic patterns in the data, leaving less to the error term. It is worth noting, however, that the RSE can never reach zero unless our model perfectly predicts every single observation, which is essentially impossible with real-world data involving human behavior. There will always be some irreducible error that no model can eliminate.
 
-The RSE also plays a foundational role in the other inference tools we discussed earlier. Recall that the standard errors of the coefficient estimates depend on the RSE - a smaller RSE leads to smaller standard errors, which in turn leads to larger t-statistics and smaller p-values. This is exactly what we observed when comparing our two models: the multiple model had a smaller RSE, which produced more precise coefficient estimates and stronger evidence of statistical significance for the predictors that truly matter.
-
 One important limitation of the RSE is that it is measured in the units of the response variable, which makes it difficult to compare across different studies or datasets with different response scales. If another researcher studied a test scored on a scale of 0 to 500, their RSE would naturally be much larger in absolute terms, even if their model were proportionally just as accurate as ours. This limitation motivates the need for a scale-independent measure of model fit, which is exactly what the $R^2$ statistic provides.
 
 ### $R^2$
 
-The **$R^2$** statistic, also known as the coefficient of determination, is one of the most commonly reported measures of model fit in applied research. Unlike the RSE, $R^2$ is a proportion that always takes a value between 0 and 1, making it easy to interpret and compare across studies regardless of the scale of the response variable. $R^2$ answers a very specific question: *what fraction of the total variation in the response variable is explained by the model?* To understand $R^2$, we need to consider two quantities.
+The **$R^2$** statistic, also known as the coefficient of determination, is one of the most commonly reported measures of model fit in applied research. Unlike the RSE, $R^2$ is a proportion that always takes a value between 0 and 1, making it easy to interpret and compare across studies regardless of the scale of the response variable. $R^2$ answers a question on what fraction of the total variation in the response variable is explained by the model. To understand $R^2$, we need to consider two quantities.
 
 The first is the **Total Sum of Squares** (TSS), defined as:
 
@@ -330,13 +318,13 @@ $R^2 = \frac{(TSS - RSS)}{TSS} = 1 - \frac{RSS}{TSS}$
 
 The numerator, TSS - RSS, represents the amount of variability in the response that is explained by the regression - it is the reduction in prediction error achieved by using the model instead of simply predicting the mean for every student. Dividing by TSS converts this into a proportion.
 
-When $R^2$ is close to 1, it means that the model explains nearly all of the variation in the response, and the RSS is very small compared to the TSS. In such a case, the predicted values $\hat{y}_i$ are very close to the actual values $y_i$, and the model provides an excellent fit. When $R^2$ is close to 0, the model explains very little of the variation, and using the model is hardly better than simply predicting the mean exam score for every student.
+When $R^2$ is close to 1, it means that the model explains nearly all of the variation in the response. In such a case, the predicted values $\hat{y}_i$ are very close to the actual values $y_i$, and the model provides an excellent fit. When $R^2$ is close to 0, the model explains very little of the variation, and using the model is hardly better than simply predicting the mean exam score for every student.
 
 ```{r}
 summary(simple_model)$r.squared
 ```
 
-In our simple regression model, $R^2$ is 0.1984. This tells us that "hours_studied" alone explains approximately 19.84% of the total variation in exam scores. In other words, about one-fifth of the differences in exam scores among students can be attributed to differences in how many hours they study. This is a meaningful finding - it confirms that study time matters - but it also reveals that roughly 80% of the variation is driven by other factors not captured in this simple model.
+In our simple regression model, $R^2$ is 0.1984. This tells us that `hours_studied` alone explains approximately 19.84% of the total variation in exam scores. In other words, about one-fifth of the differences in exam scores among students can be attributed to differences in how many hours they study. This is a meaningful finding - it confirms that study time matters - but it also reveals that roughly 80% of the variation is driven by other factors not captured in this simple model.
 
 ```{r}
 summary(multiple_model)$r.squared
@@ -355,19 +343,17 @@ summary(multiple_model)$adj.r.squared
 
 In our simple model, the Adjusted $R^2$ is 0.1983, virtually identical to $R^2$ because there is only one predictor and the penalty is negligible. In our multiple model, the Adjusted $R^2$ is 0.5979, also nearly identical to the regular $R^2$ of 0.5982. The fact that the Adjusted $R^2$ barely differs from $R^2$ in the multiple model tells us that all six predictors (or at least most of them) are genuinely contributing to the model's explanatory power - the improvement in fit is not merely an artifact of adding more variables.
 
-It is also worth noting the connection between $R^2$ and correlation. In simple linear regression, $R^2$ is exactly equal to the square of the Pearson correlation coefficient r between X and Y. In our case, $R^2$ = 0.1984 for the simple model, so the correlation between "hours_studied" and "exam_score" is $r = \sqrt{0.1984} \approx 0.445$. In multiple regression, this simple relationship no longer holds (because there are multiple predictors), but $R^2$ can be shown to equal the squared correlation between the observed values $y_i$ and the fitted values $\hat{y}_i$. This provides a nice intuitive interpretation: $R^2$ tells us how closely the model's predictions track the actual outcomes.
+It is also worth noting the connection between $R^2$ and correlation. In simple linear regression, $R^2$ is exactly equal to the square of the Pearson correlation coefficient r between $X$ and $Y$. In our case, $R^2$ = 0.1984 for the simple model, so the correlation between `hours_studied` and `exam_score` is $r = \sqrt{0.1984} \approx 0.445$. In multiple regression, this simple relationship no longer holds (because there are multiple predictors), but $R^2$ can be shown to equal the squared correlation between the observed values $y_i$ and the fitted values $\hat{y}_i$. This provides a nice intuitive interpretation: $R^2$ tells us how closely the model's predictions track the actual outcomes.
 
 ### F-statistic
 
-While the t-statistic and its associated p-value allow us to test whether each individual predictor is significantly related to the response, the **F-statistic** addresses a different and more fundamental question: *is the model as a whole useful?* Specifically, the F-statistic tests the null hypothesis that all slope coefficients in the model are simultaneously equal to zero $H_0: \beta_1 = \beta_2 = ... = \beta_p = 0$ against the alternative hypothesis:
-
-$H_a$: at least one $\beta_j$ is non-zero.
+While the t-statistic and its associated p-value allow us to test whether each individual predictor is significantly related to the response, the **F-statistic** addresses if the model as a whole is useful. Specifically, the F-statistic tests the null hypothesis that all slope coefficients in the model are simultaneously equal to zero $H_0: \beta_1 = \beta_2 = ... = \beta_p = 0$ against the alternative hypothesis $H_a$: at least one $\beta_j$ is non-zero.
 
 If the null hypothesis is true, then none of the predictors have any relationship with the response, and the model is no better than simply predicting the mean for every observation. The F-statistic is computed as:
 
 $F = \frac{\frac{TSS - RSS}{p}}{\frac{RSS}{n - p -1}}$
 
-The numerator measures how much of the total variance the model explains, divided by the number of predictors p. The denominator measures how much variance remains unexplained, divided by the residual degrees of freedom. If the model is no better than chance, the numerator and denominator should be roughly equal, producing an F-statistic close to 1. If the model captures real patterns in the data, the numerator will be much larger than the denominator, producing a large F-statistic.
+The numerator measures how much of the total variance the model explains, divided by the number of predictors $p$. The denominator measures how much variance remains unexplained, divided by the residual degrees of freedom. If the model is no better than chance, the numerator and denominator should be roughly equal, producing an F-statistic close to 1. If the model captures real patterns in the data, the numerator will be much larger than the denominator, producing a large F-statistic.
 
 One might reasonably ask: why do we need the F-statistic at all when we already have individual t-tests for each coefficient? The answer lies in the multiple testing problem. When we have many predictors, each with its own t-test, the probability of finding at least one "significant" result by pure chance increases dramatically. For example, if we tested 100 completely useless predictors at the 5% significance level, we would expect about 5 of them to appear significant purely by chance. The F-statistic avoids this problem because it is a single, omnibus test that accounts for the total number of predictors. It maintains the correct overall error rate regardless of how many predictors are in the model. So the proper approach is to first check the F-statistic to determine whether the model as a whole is significant, and only then examine the individual t-statistics to identify which specific predictors are contributing.
 
@@ -375,7 +361,7 @@ One might reasonably ask: why do we need the F-statistic at all when we already 
 summary(simple_model)$fstatistic
 ```
 
-In our simple regression model, the F-statistic is 1,635 with 1 and 6,605 degrees of freedom, and the associated p-value is less than $2.2 \times 10^{16}$. Since we have only one predictor in the simple model, the F-test is equivalent to the t-test for that predictor. In fact, the F-statistic in simple regression is exactly the square of the t-statistic: $40.44^2 \approx 1,635$. The overwhelming magnitude of this F-statistic and its essentially zero p-value tell us that the model is highly significant - "hours_studied" is unquestionably related to "exam_score".
+In our simple regression model, the F-statistic is 1,635 with 1 and 6,605 degrees of freedom, and the associated p-value is less than $2.2 \times 10^{16}$. Since we have only one predictor in the simple model, the F-test is equivalent to the t-test for that predictor. In fact, the F-statistic in simple regression is exactly the square of the t-statistic: $40.44^2 \approx 1,635$. The overwhelming magnitude of this F-statistic and its essentially zero p-value tell us that the model is highly significant - `hours_studied` is unquestionably related to `exam_score`.
 
 ```{r}
 summary(multiple_model)$fstatistic
@@ -383,7 +369,7 @@ summary(multiple_model)$fstatistic
 
 In our multiple regression model, the F-statistic is 1,638 with 6 and 6,600 degrees of freedom, and the p-value is again less than $2.2 \times 10^{-16}$. This tests whether at least one of the six predictors is related to exam scores. The result decisively rejects the null hypothesis - the model as a whole is highly significant, and at least one (and as we saw from the individual t-tests, five out of six) predictors are genuinely related to student performance. The fact that the F-statistic is 1,638 rather than close to 1 tells us that the model explains vastly more variance than we would expect by chance alone.
 
-It is worth pausing to note an interesting detail. Even though "sleep_hours" was not individually significant (p = 0.384), the overall F-test is still overwhelmingly significant. This is entirely consistent: the F-test only requires that at least one predictor be related to the response, and the other five predictors more than satisfy this requirement. The F-test does not tell us which predictors are significant - that is the job of the individual t-tests. But it does tell us that the model as a whole is capturing real patterns.
+It is worth pausing to note an interesting detail. Even though `sleep_hours` was not individually significant (p = 0.384), the overall F-test is still overwhelmingly significant. This is entirely consistent: the F-test only requires that at least one predictor be related to the response, and the other five predictors more than satisfy this requirement. The F-test does not tell us which predictors are significant - that is the job of the individual t-tests. But it does tell us that the model as a whole is capturing real patterns.
 
 ## Interaction Terms
 
