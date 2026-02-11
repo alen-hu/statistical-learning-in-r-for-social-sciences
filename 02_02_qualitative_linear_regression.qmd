@@ -54,3 +54,74 @@ student_performance <- student_performance |>
         exam_score = Exam_Score,
     )
 ```
+
+All the models we have built so far have used only quantitative predictors - variables measured on a numerical scale, such as `hours_studied`, `attendance`, and `previous_scores`. But many of the most important variables in social science research are **qualitative**, meaning they represent categories rather than numbers. In our `student_performance` dataset, we have a rich set of qualitative variables: `gender` (Male or Female), `school_type` (Public or Private), `parental_involvement` (Low, Medium, or High), `motivation_level` (Low, Medium, or High), and several others. These variables clearly have the potential to influence exam scores, but we cannot simply plug them into a regression equation as they are. The equation $\text{exam_score} = \beta_0 + \beta_1 \times gender$ does not make mathematical sense when `gender` takes the values "Male" and "Female" - we cannot multiply a number by a word. We need a way to translate qualitative categories into a numerical form that linear regression can work with. This is accomplished through the use of dummy variables.
+
+A **dummy variable** (also called an indicator variable) is a numerical variable that takes only the values 0 and 1, where 1 indicates membership in a particular category and 0 indicates non-membership. The key principle is straightforward: for a qualitative predictor with two levels (categories), we create one dummy variable; for a predictor with three levels, we create two dummy variables; and in general, for a predictor with k levels, we create $k − 1$ dummy variables. The category that does not receive its own dummy variable is called the **baseline category**, and all the other categories are compared against it.
+
+Let us begin with the simplest case. `gender` in our dataset has two levels: male and female. To include `gender` in a regression, we create a single dummy variable. R does this automatically, but conceptually it works as follows: $x = 1$ if the student is male, and $x = 0$ if the student is female.With this coding, our regression model becomes:
+
+$\text{exam_score} = \beta_0 + \beta_1x + \epsilon$
+
+When $x = 0$ (female students), the model reduces to $\text{exam_score} = \beta_0 + \epsilon$, so $\beta_0$ represents the average exam score for female students. When $x = 1$ (male students), the model becomes $\text{exam_score} = \beta_0 + \beta_1 + \epsilon$, so $\beta_0 + \beta_1$ represents the average exam score for male students. Therefore, $\beta_1$ represents the difference in average exam scores between male and female students. If $\beta_1$ is positive, males score higher on average; if negative, females score higher; and if $\beta_1$ is zero, there is no difference between the groups. The hypothesis test for $\beta_1$ directly tests whether this difference is statistically significant.
+
+The choice of which category serves as the baseline is arbitrary from a mathematical standpoint - it does not affect the model's predictions or its overall fit. If we had coded female as 1 and male as 0, the intercept would represent the male average and the slope would have the opposite sign, but the predicted values for each group would be exactly the same. R automatically selects the baseline category alphabetically, so female becomes the baseline for `gender`, and the output will show a coefficient labeled gender male representing the difference relative to females.
+
+```{r}
+model_gender <- lm(
+    exam_score ~ gender,
+    data = student_performance
+)
+
+summary(model_gender)
+```
+
+Now consider a qualitative predictor with three levels. `parental_involvement` has the categories Low, Medium, and High. To encode this variable, we need two dummy variables - one fewer than the number of categories. R creates them as follows:
+
+- $x_1$ = 1 if `parental_involvement` is Medium, 0 otherwise and
+
+- $x_2$ = 1 if `parental_involvement` is High, 0 otherwise.
+
+When both $x_1$ = 0 and $x_2$ = 0, the student has Low parental involvement — this is the baseline category. The regression model becomes:
+
+$\text{exam_score} = \beta_0 + \beta_1x_1 + \beta_2x_2 + \epsilon$
+
+For students with Low involvement: $\text{exam_score} = \beta_0 + \epsilon$, so $\beta_0$ is the average score for the Low group. For students with Medium involvement: $\text{exam_score} = \beta_0 + \beta_1 + \epsilon$, so $\beta_1$ is the difference in average scores between the Medium and Low groups. For students with High involvement: $\text{exam_score} = \beta_0 + \beta_2 + \epsilon$, so $\beta_2$ is the difference in average scores between the High and Low groups. Each coefficient represents a comparison against the baseline category - this is a crucial point for interpretation. We are not estimating absolute average scores for each group; we are estimating differences relative to the reference group.
+
+One important consequence of this coding scheme is that the p-value for each dummy variable tests whether that specific category differs significantly from the baseline category, but it does not directly test whether the qualitative variable as a whole is significant. For example, it is possible that neither Medium nor High individually differs significantly from Low, yet the variable as a whole still has a significant overall effect.
+
+To test the overall significance of a qualitative predictor, we need to use the F-test that compares a model with the variable included to a model without it. We will see this in practice with our results.
+
+```{r}
+model_parental <- lm(
+    exam_score ~ parental_involvement,
+    data = student_performance
+)
+
+summary(model_parental)
+
+model_motivation <- lm(
+    exam_score ~ motivation_level,
+    data = student_performance
+)
+
+summary(model_motivation)
+
+model_combined <- lm(
+    exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + gender + parental_involvement + motivation_level + school_type,
+    data = student_performance
+)
+
+summary(model_combined)
+
+# ============================================================
+# F-tests for overall significance of each qualitative predictor
+# Model without qualitative predictors (quantitative only)
+# ============================================================
+model_quant_only <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions, data = student_performance)
+model_plus_gender <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + gender, data = student_performance)
+model_plus_parental <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + parental_involvement, data = student_performance)
+model_plus_motivation <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + motivation_level, data = student_performance)
+model_plus_school <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + school_type, data = student_performance)
+anova(model_quant_only, model_plus_school)
+```

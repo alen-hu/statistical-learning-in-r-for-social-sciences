@@ -1,3 +1,9 @@
+---
+nocite: |
+  @james2021introduction
+  @field2024discovering
+---
+
 # References {.unnumbered}
 
 ::: {#refs}
