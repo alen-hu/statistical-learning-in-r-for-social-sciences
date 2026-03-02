@@ -1,9 +1,12 @@
 ---
-title: "Quntitative Linear Regression"
-description: "This chapter explores linear regression as a core statistical method for modeling relationships between variables. It begins with simple linear regression, examining how a single predictor relates to an outcome, before extending to multiple linear regression, where several predictors are combined to improve explanatory power. The chapter then introduces interaction effects, showing how the relationship between a predictor and the outcome can change depending on the value of another variable. Finally, it covers hierarchical linear regression, a model-building strategy in which predictors are entered in theoretically guided blocks, allowing researchers to assess the incremental contribution of each set of variables to the explained variance. Throughout, emphasis is placed on interpretation of coefficients, model comparison, and practical application."
+title: "Linear Regression Model"
+description: ""
 number-sections: true
 title-block-banner: "#00868B"
 title-block-banner-color: "white"
+crossref:
+  fig-title: "Figure"
+  tbl-title: "Table"
 ---
 
 ```{r}
@@ -54,6 +57,59 @@ student_performance <- student_performance |>
         exam_score = Exam_Score,
     )
 ```
+
+::: {.callout-note icon="false" collapse="true" title="Dataset: `student_performance`"}
+The `student_performance` dataset is a large educational dataset that seeks to capture the many different factors that can influence how well a student performs on their final exam. The fundamental research question behind this dataset is: *what predicts student academic achievement, and how strongly does each factor contribute?* This dataset is publicly available on the Kaggle platform, where it was published under the title (Student Performance Factors) [https://www.kaggle.com/datasets/lainguyn123/student-performance-factors]. The dataset contains 6,607 observations, where each observation represents one individual student. For each student, 20 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 19 are potential predictors (independent variables). Let us walk you through each of them:
+
+- "hours_studied" records how many hours per week each student dedicates to studying,
+
+- "attendance" represents the percentage of classes each student attended during the course,
+
+- "parental_involvement" describes the degree to which a student's parents are involved in their education within the three levels (Low, Medium, and High),
+
+- "access_to_resources" indicates the level of access a student has to educational resources such as textbooks, computers, or online materials within the three levels (Low, Medium, and High),
+
+- "extracurricular_activities" records whether the student participates in extracurricular activities (`TRUE` or `FALSE`),
+
+- "sleep_hours" records the average number of hours of sleep the student gets per night,
+
+- "previous_scores" captures the student's scores from prior academic assessments,
+
+- "motivation_level" captures the student's self-reported level of motivation within the three categories (Low, Medium, and High),
+
+- "internet_access" indicates whether the student has access to the internet (`TRUE` or `FALSE`),
+
+- "tutoring_sessions" records the number of tutoring sessions the student attended,
+
+- "family_income" records the economic status of the student's family, categorized as Low, Medium, or High,
+
+- "teacher_quality" describes the perceived quality of the student's teachers, categorized as Low, Medium, or High,
+
+- "school_type" indicates whether the student attends a public or private school,
+
+- "peer_influence" describes the nature of the influence the student's peer group has on their academic behavior, and it has three levels (Negative, Neutral, and Positive),
+
+- "physical_activity" measures how many hours per week the student spends on physical activities,
+
+- "learning_disabilities" records whether the student has been diagnosed with any learning disabilities (`TRUE` or `FALSE`),
+
+- "parental_education_level" captures the highest level of education achieved by the student's parents, with categories including High School, College, and Postgraduate.
+
+- "distance_from_home" indicates how far the student lives from their school, categorized as Near, Moderate, or Far,
+
+- "gender" records the student's gender as either Male or Female,
+
+- "exam_score" records the score that each student achieved on their final exam.
+
+```{r}
+# Pregled podataka
+glimpse(student_performance)
+```
+:::
+
+**Linear regression** is one of the oldest, most fundamental, and most widely used methods in statistics and statistical learning. Despite its simplicity, it remains an essential tool for anyone working with data, especially in the social sciences. The core idea behind linear regression is straightforward: we want to understand and quantify the relationship between one or more explanatory variables and a single outcome variable. More specifically, linear regression assumes that the relationship between the dependent and the independent variable can be described, at least approximately, by a straight line - or in the case of multiple predictors, by a flat surface (a hyperplane) in higher-dimensional space.
+
+The purpose of linear regression is twofold. First, it serves an explanatory purpose: it helps us understand which factors are associated with the outcome and how strongly each factor contributes, while holding the other factors constant. Second, it serves a predictive purpose: once we have estimated the relationship, we can use it to predict the outcome for new observations based on their predictor values. In our student performance example, the central question is: *what factors influence a student's exam score, and by how much?* Linear regression allows us to answer questions such as "*does studying more hours lead to higher exam scores?*" and "*how much additional score can a student expect to gain for each additional hour of study?*"
 
 The simplest form of linear regression involves just one independent variable. This is called **simple linear regression**. Mathematically, it takes the form:
 
@@ -535,3 +591,76 @@ In the third block, we add "tutoring_sessions". The $R^2$ increases from 0.5722 
 In the fourth and final block, we add "sleep_hours" and "physical_activity". The $R^2$ increases from 0.5967 to 0.5982, yielding a $\Delta R^2$ of 0.0015. This is a very small increment - lifestyle factors explain only about 0.15 additional percentage points of variance in exam scores after all the academic variables have been accounted for. This finding tells us that once we know how a student performed previously, how much they study, how often they attend class, and how many tutoring sessions they receive, knowing about their sleep habits and physical exercise patterns adds almost nothing to our ability to predict their exam score. This does not necessarily mean that sleep and exercise are unimportant for well-being or general cognitive function - there is extensive research suggesting they are. But in terms of their incremental contribution to predicting exam scores specifically, over and above the academic and effort variables, their contribution is negligible. It is also worth recalling that in our earlier multiple regression analysis, "sleep_hours" was not statistically significant (p = 0.384), while "physical_activity" was significant but had a small coefficient (0.144). The hierarchical analysis confirms that these lifestyle variables are the least important block in our model.
 
 The ANOVA table provides formal F-tests for the significance of each block's contribution. Let me explain each row. The first row shows Model 1 (Block 1) with 6,605 residual degrees of freedom and an RSS of 96,921. This serves as the starting point. No comparison is made yet because there is no preceding model. The second row compares Model 2 to Model 1. The difference is 2 degrees of freedom (because we added two predictors: "hours_studied" and "attendance"), and the reduction in RSS is 54,143. This is a massive reduction - the unexplained variance was cut by more than half. The F-statistic is 4,447.92 and the p-value is less than $2.2 \times 10{-16}$. This F-statistic is extraordinarily large, providing overwhelming evidence that adding study behavior and engagement variables produces a significant improvement in the model. To understand the F-statistic intuitively, the numerator of the F-test takes the reduction in RSS per added predictor (54,143 / 2 = 27,071.5) and divides it by the residual mean square of the fuller model (approximately 6.09). The ratio of 4,448 means that each of the two new predictors reduced the RSS by roughly 4,448 times more than what a useless random predictor would be expected to contribute. This is exceptionally strong evidence. The third row compares Model 3 to Model 2. Adding Tutoring_Sessions (1 degree of freedom) reduced the RSS by 2,459. The F-statistic is 404.02 with a p-value less than $2.2 \times 10^{-16}$. This is also highly significant, confirming that tutoring sessions provide a meaningful improvement in the model even after study hours and attendance are already included. The F-statistic of 404 is smaller than the 4,448 for Block 2, which makes sense - tutoring contributes less than study behavior, but its contribution is still far beyond what chance alone could produce. The fourth row compares Model 4 to Model 3. Adding "sleep_hours" and "physical_activity" (2 degrees of freedom) reduced the RSS by only 150. The F-statistic is 12.34 with a p-value of $4.484 \times 10^{10-6}$. Although this p-value is well below 0.05 and therefore statistically significant, the magnitude of the improvement is tiny compared to the earlier blocks. The F-statistic of 12.34, while significant, is orders of magnitude smaller than the F-statistics for Blocks 2 and 3. The RSS decreased from 40,320 to 40,169 - a reduction of less than 0.4%. This confirms that lifestyle factors achieve statistical significance (largely thanks to Physical_Activity, as we know Sleep_Hours alone is not significant), but their practical contribution to explaining exam scores is minimal.
+
+## Qualitative Linear Regression
+
+All the models we have built so far have used only quantitative predictors - variables measured on a numerical scale, such as `hours_studied`, `attendance`, and `previous_scores`. But many of the most important variables in social science research are **qualitative**, meaning they represent categories rather than numbers. In our `student_performance` dataset, we have a rich set of qualitative variables: `gender` (Male or Female), `school_type` (Public or Private), `parental_involvement` (Low, Medium, or High), `motivation_level` (Low, Medium, or High), and several others. These variables clearly have the potential to influence exam scores, but we cannot simply plug them into a regression equation as they are. The equation $\text{exam_score} = \beta_0 + \beta_1 \times gender$ does not make mathematical sense when `gender` takes the values "Male" and "Female" - we cannot multiply a number by a word. We need a way to translate qualitative categories into a numerical form that linear regression can work with. This is accomplished through the use of dummy variables.
+
+A **dummy variable** (also called an indicator variable) is a numerical variable that takes only the values 0 and 1, where 1 indicates membership in a particular category and 0 indicates non-membership. The key principle is straightforward: for a qualitative predictor with two levels (categories), we create one dummy variable; for a predictor with three levels, we create two dummy variables; and in general, for a predictor with k levels, we create $k − 1$ dummy variables. The category that does not receive its own dummy variable is called the **baseline category**, and all the other categories are compared against it.
+
+Let us begin with the simplest case. `gender` in our dataset has two levels: male and female. To include `gender` in a regression, we create a single dummy variable. R does this automatically, but conceptually it works as follows: $x = 1$ if the student is male, and $x = 0$ if the student is female.With this coding, our regression model becomes:
+
+$\text{exam_score} = \beta_0 + \beta_1x + \epsilon$
+
+When $x = 0$ (female students), the model reduces to $\text{exam_score} = \beta_0 + \epsilon$, so $\beta_0$ represents the average exam score for female students. When $x = 1$ (male students), the model becomes $\text{exam_score} = \beta_0 + \beta_1 + \epsilon$, so $\beta_0 + \beta_1$ represents the average exam score for male students. Therefore, $\beta_1$ represents the difference in average exam scores between male and female students. If $\beta_1$ is positive, males score higher on average; if negative, females score higher; and if $\beta_1$ is zero, there is no difference between the groups. The hypothesis test for $\beta_1$ directly tests whether this difference is statistically significant.
+
+The choice of which category serves as the baseline is arbitrary from a mathematical standpoint - it does not affect the model's predictions or its overall fit. If we had coded female as 1 and male as 0, the intercept would represent the male average and the slope would have the opposite sign, but the predicted values for each group would be exactly the same. R automatically selects the baseline category alphabetically, so female becomes the baseline for `gender`, and the output will show a coefficient labeled gender male representing the difference relative to females.
+
+```{r}
+model_gender <- lm(
+    exam_score ~ gender,
+    data = student_performance
+)
+
+summary(model_gender)
+```
+
+Now consider a qualitative predictor with three levels. `parental_involvement` has the categories Low, Medium, and High. To encode this variable, we need two dummy variables - one fewer than the number of categories. R creates them as follows:
+
+- $x_1$ = 1 if `parental_involvement` is Medium, 0 otherwise and
+
+- $x_2$ = 1 if `parental_involvement` is High, 0 otherwise.
+
+When both $x_1$ = 0 and $x_2$ = 0, the student has Low parental involvement — this is the baseline category. The regression model becomes:
+
+$\text{exam_score} = \beta_0 + \beta_1x_1 + \beta_2x_2 + \epsilon$
+
+For students with Low involvement: $\text{exam_score} = \beta_0 + \epsilon$, so $\beta_0$ is the average score for the Low group. For students with Medium involvement: $\text{exam_score} = \beta_0 + \beta_1 + \epsilon$, so $\beta_1$ is the difference in average scores between the Medium and Low groups. For students with High involvement: $\text{exam_score} = \beta_0 + \beta_2 + \epsilon$, so $\beta_2$ is the difference in average scores between the High and Low groups. Each coefficient represents a comparison against the baseline category - this is a crucial point for interpretation. We are not estimating absolute average scores for each group; we are estimating differences relative to the reference group.
+
+One important consequence of this coding scheme is that the p-value for each dummy variable tests whether that specific category differs significantly from the baseline category, but it does not directly test whether the qualitative variable as a whole is significant. For example, it is possible that neither Medium nor High individually differs significantly from Low, yet the variable as a whole still has a significant overall effect.
+
+To test the overall significance of a qualitative predictor, we need to use the F-test that compares a model with the variable included to a model without it. We will see this in practice with our results.
+
+```{r}
+model_parental <- lm(
+    exam_score ~ parental_involvement,
+    data = student_performance
+)
+
+summary(model_parental)
+
+model_motivation <- lm(
+    exam_score ~ motivation_level,
+    data = student_performance
+)
+
+summary(model_motivation)
+
+model_combined <- lm(
+    exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + gender + parental_involvement + motivation_level + school_type,
+    data = student_performance
+)
+
+summary(model_combined)
+
+# ============================================================
+# F-tests for overall significance of each qualitative predictor
+# Model without qualitative predictors (quantitative only)
+# ============================================================
+model_quant_only <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions, data = student_performance)
+model_plus_gender <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + gender, data = student_performance)
+model_plus_parental <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + parental_involvement, data = student_performance)
+model_plus_motivation <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + motivation_level, data = student_performance)
+model_plus_school <- lm(exam_score ~ hours_studied + attendance + previous_scores + tutoring_sessions + school_type, data = student_performance)
+anova(model_quant_only, model_plus_school)
+```
