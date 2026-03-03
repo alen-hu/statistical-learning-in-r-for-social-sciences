@@ -6,3 +6,7 @@ main p {
 strong, b {
   color: #00868B;
 }
+
+p code {
+  color: #00868B !important;
+}
