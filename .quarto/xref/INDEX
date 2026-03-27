@@ -37,5 +37,8 @@
   },
   "02_linear_regression.qmd": {
     "02_linear_regression.html": "c974e9dd"
+  },
+  "03_classification.qmd": {
+    "03_classification.html": "d9c00a10"
   }
 }

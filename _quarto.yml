@@ -10,6 +10,7 @@ book:
     - index.qmd
     - 01_introduction_to_statistical_learning.qmd
     - 02_linear_regression.qmd
+    - 03_classification.qmd
     - references.qmd
 
 bibliography: references.bib
