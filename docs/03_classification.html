@@ -123,6 +123,35 @@ background: #00868B;
       }
 </style>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -212,8 +241,17 @@ background: #00868B;
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link active" data-scroll-target="#logistic-regression"><span class="header-section-number">1</span> Logistic regression</a>
+  <ul class="collapse">
+  <li><a href="#multiple-logistic-regression" id="toc-multiple-logistic-regression" class="nav-link" data-scroll-target="#multiple-logistic-regression"><span class="header-section-number">1.1</span> Multiple Logistic Regression</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -222,10 +260,214 @@ background: #00868B;
 
 
 
+<div class="callout callout-style-default callout-note no-icon callout-titled" title="Dataset: `bank_dataset`">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Dataset: <code>bank_dataset</code>
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The <code>bank_dataset</code> dataset is a social and behavioral dataset that seeks to capture the demographic, financial, and campaign-related factors that influence whether a bank client decides to subscribe to a term deposit following a direct marketing campaign. The fundamental research question behind this dataset is: <em>what characteristics of a client and of the marketing contact predict the decision to subscribe to a financial product, and how strongly does each factor contribute?</em> This dataset is publicly available on the <a href="https://archive.ics.uci.edu/dataset/222/bank+marketing">UCI Machine Learning Repository</a>. The dataset contains 4,521 observations, where each observation represents one individual client contacted during a phone-based marketing campaign run by a Portuguese banking institution. For each client, 17 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 16 are potential predictors (independent variables). The variables are as follows:</p>
+<ul>
+<li><p><code>age</code> records the age of the client in years,</p></li>
+<li><p><code>job</code> describes the type of occupation of the client within the different categories,</p></li>
+<li><p><code>marital</code> records the marital status of the client, categorized as married, single, or divorced (where divorced also includes widowed),</p></li>
+<li><p><code>education</code> indicates the highest level of education the client has completed, with categories primary, secondary, and tertiary,</p></li>
+<li><p><code>default</code> indicates whether the client has credit currently in default (<code>yes</code> or <code>no</code>),</p></li>
+<li><p><code>balance</code> records the average annual balance held in the client’s bank account, measured in euros,</p></li>
+<li><p><code>housing</code> indicates whether the client has an active housing loan (<code>yes</code> or <code>no</code>),</p></li>
+<li><p><code>loan</code> indicates whether the client has an active personal loan (<code>yes</code> or <code>no</code>),</p></li>
+<li><p><code>contact</code> describes the type of communication channel used to contact the client, with categories cellular, telephone, and unknown,</p></li>
+<li><p><code>day</code> records the day of the month on which the client was last contacted,</p></li>
+<li><p><code>month</code> records the month of the year in which the client was last contacted,</p></li>
+<li><p><code>duration</code> records the duration of the last contact with the client in seconds (this variable is only known after the call has ended, and therefore should be used with caution in predictive modeling),</p></li>
+<li><p><code>campaign</code> records the total number of times the client was contacted during the current marketing campaign,</p></li>
+<li><p><code>pdays</code> records the number of days that elapsed since the client was last contacted in a previous campaign (-1 indicates the client had not been previously contacted),</p></li>
+<li><p><code>previous</code> records the total number of times the client was contacted before the current campaign,</p></li>
+<li><p><code>poutcome</code> describes the outcome of the previous marketing campaign for this client, with categories success, failure, other, and unknown,</p></li>
+<li><p><code>y</code> records whether the client ultimately subscribed to the term deposit (<code>yes</code> or <code>no</code>), and this is the outcome variable we aim to predict.</p></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bank_dataset)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 45,211
+Columns: 17
+$ age       &lt;int&gt; 58, 44, 33, 47, 33, 35, 28, 42, 58, 43, 41, 29, 53, 58, 57, …
+$ job       &lt;fct&gt; management, technician, entrepreneur, blue-collar, unknown, …
+$ marital   &lt;fct&gt; married, single, married, married, single, married, single, …
+$ education &lt;fct&gt; tertiary, secondary, secondary, unknown, unknown, tertiary, …
+$ default   &lt;fct&gt; no, no, no, no, no, no, no, yes, no, no, no, no, no, no, no,…
+$ balance   &lt;int&gt; 2143, 29, 2, 1506, 1, 231, 447, 2, 121, 593, 270, 390, 6, 71…
+$ housing   &lt;fct&gt; yes, yes, yes, yes, no, yes, yes, yes, yes, yes, yes, yes, y…
+$ loan      &lt;fct&gt; no, no, yes, no, no, no, yes, no, no, no, no, no, no, no, no…
+$ contact   &lt;fct&gt; unknown, unknown, unknown, unknown, unknown, unknown, unknow…
+$ day       &lt;int&gt; 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, …
+$ month     &lt;fct&gt; may, may, may, may, may, may, may, may, may, may, may, may, …
+$ duration  &lt;int&gt; 261, 151, 76, 92, 198, 139, 217, 380, 50, 55, 222, 137, 517,…
+$ campaign  &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+$ pdays     &lt;int&gt; -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, …
+$ previous  &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
+$ poutcome  &lt;fct&gt; unknown, unknown, unknown, unknown, unknown, unknown, unknow…
+$ y         &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no, no, no, no, no, …</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Statistical learning is a broad field concerned with understanding the relationship between a set of independent variables and dependent variable. The central question in statistical learning is always the same: <em>given what we know about a person, an observation, or a case through its predictor values, what can we say about the response?</em> The methods we use to answer this question fall into two major families, and the distinction between them depends entirely on the nature of the response variable.</p>
+<p>When the response variable is quantitative - meaning it takes on numerical values along a continuous scale, such as income in euros, blood pressure in millimetres of mercury, or a score on a psychological test - we are dealing with a regression problem. Linear regression, covered in the earlier chapter, is the most classical tool for this kind of problem. It fits a model that predicts a numerical outcome as a linear combination of the independent variables, and the dependent variable is a number that can, in principle, take any value on the real number line.</p>
+<p>However, in a great many research situations the dependent variable is not quantitative but qualitative. A qualitative independent variable, also called a <strong>categorical variable</strong>, takes on values from a finite, unordered set of categories. For instance, a medical diagnosis might be “disease present” or “disease absent”. A survey respondent might identify as “satisfied”, “neutral”, or “dissatisfied”. A voter might choose among several political parties. In all of these situations, the response is not a number on a scale but a label indicating membership in a group. The task of predicting which category a new observation belongs to is what we call <strong>classification</strong>, and the methods designed for this task are called <strong>classifiers</strong>.</p>
+<p>Classification therefore occupies a position within statistical learning that is parallel to regression. If regression answers the question “how much” then classification answers the question “which one” Both regression and classification are forms of supervised learning, meaning that we have a training dataset in which both the predictors and the true response are known, and we use this dataset to build a model that can make predictions for new observations whose response we do not yet know. The difference is simply in the type of response we are trying to predict.</p>
+<p>Imagine that our response variable has two categories, which we code numerically as 0 and 1. For example, in our heart disease dataset, we might code “No disease” as 0 and “Disease present” as 1. One might think that we could simply fit a linear regression model with this 0/1 variable as the response, and then use the fitted values as predicted probabilities. If the model predicts a value close to 1 for a given patient, we would classify that patient as having heart disease, and if it predicts a value close to 0, we would classify the patient as healthy. The problem with this approach is that linear regression does not know that the response is a probability. A linear regression model produces fitted values by computing a linear combination of the predictors, and there is nothing in the mathematics of linear regression that constrains these fitted values to fall between 0 and 1. In practice, for some combinations of predictor values, the model will produce predictions that are less than 0 or greater than 1. These values cannot be interpreted as probabilities, and they make no logical sense in the context of classification.</p>
+<p>The situation becomes even more problematic when the response variable has more than two categories. Suppose we are predicting a patient’s diagnosis and the possible outcomes are “mild condition”, “moderate condition”, and “severe condition.” To use linear regression, we would need to assign numerical codes to these categories - say 1, 2, and 3. But this coding implies that the difference between mild and moderate is the same as the difference between moderate and severe, and it implies a specific ordering. If we had instead used the codes 1, 2, and 4, the model would produce different results, even though the underlying categories have not changed. For a truly nominal variable with no natural ordering - say, three types of chest pain - any numerical coding would impose a structure that simply does not exist in the data. This is a fundamental flaw that cannot be fixed by choosing a clever coding scheme.</p>
+<p>Classification methods avoid these problems entirely. Logistic regression, for example, models the probability of belonging to a particular class using a mathematical function - the logistic function - that is guaranteed to produce values between 0 and 1, no matter what values the predictors take. Discriminant analysis methods approach the problem from a different angle by modelling the distribution of the predictors within each class and then computing class probabilities using Bayes’ theorem. In both cases, the output of the model is a set of well-defined probabilities that sum to one across the possible classes, and the final classification is made by assigning each observation to the class with the highest estimated probability.</p>
+<p>Our bank marketing dataset provides a perfect illustration of a classification problem. We have 4,521 individuals, and for each individual we have recorded 16 predictor variables that capture various aspects of their demographic profile, financial situation, and interactions with the marketing campaign — their age, type of occupation, marital status, highest level of education, whether they have credit in default, their average annual bank balance in euros, whether they hold a housing loan, whether they hold a personal loan, the communication channel used to contact them, the day and month of last contact, the duration of the last phone call in seconds, the number of times they were contacted during the current campaign, the number of days since they were last contacted in a previous campaign, the number of times they were contacted before the current campaign, and the outcome of the previous marketing campaign. The response variable is whether or not the client subscribed to a term deposit, recorded as a binary outcome: “no” for clients who did not subscribe and “yes” for those who did.</p>
+<p>The classification task here is straightforward to state: given the 16 demographic, financial, and campaign-related measurements for a new client, we want to predict whether that client will subscribe to the term deposit or not. But although the question is simple, the methodology must be chosen carefully. We need a method that will estimate the probability that a given client belongs to the “yes” group versus the “no” group, and we need to evaluate how accurately that method performs so that we can trust its predictions in a marketing, business, or social research context.</p>
+<p>In practice, we would proceed by first splitting the data or using resampling methods to assess how well our chosen classifier generalises to new observations. We would fit the classification model on a training portion of the data, obtain predicted class probabilities for each observation in the test portion, assign each observation to the class with the highest probability, and then evaluate performance using tools such as the confusion matrix and the ROC curve. We might try several different classification methods - logistic regression, linear discriminant analysis, quadratic discriminant analysis, naive Bayes, K-nearest neighbours - and compare their performance to determine which one is most appropriate for this particular dataset.</p>
+<p>There are more classification methods and the field of classification is rich and rapidly evolving. However, the five methods - logistic regression, linear discriminant analysis, quadratic discriminant analysis, naive Bayes, and K-nearest neighbours - are among the most widely used and foundational techniques in the social sciences. They provide a solid starting point for understanding the principles of classification.</p>
+<p><strong>Logistic regression</strong> is the most widely used classification method in the social sciences conceptually close to linear regression. It directly models the probability that the response belongs to a particular class by applying the logistic function to a linear combination of the predictors. The result is a model in which the log-odds of belonging to one class versus the other is a linear function of the predictors. The coefficients are estimated using maximum likelihood, and they can be interpreted in terms of how each predictor affects the odds of the outcome.</p>
+<p><strong>Linear discriminant analysis</strong> (LDA) takes a different approach. Instead of modelling the probability of class membership directly, it models the distribution of the predictor variables within each class. Specifically, it assumes that the predictors follow a multivariate normal distribution within each class and that all classes share the same covariance matrix. Using Bayes’ theorem, it then computes the posterior probability that a new observation belongs to each class. Because of the shared covariance assumption, the decision boundaries between classes are linear. LDA is particularly useful when the classes are well separated and when the normality assumption is approximately met.</p>
+<p><strong>Quadratic discriminant analysis</strong> (QDA) is a generalisation of LDA that relaxes the shared covariance assumption. Each class is allowed to have its own covariance matrix, which means the decision boundaries between classes can be curved rather than straight. This gives QDA more flexibility to capture complex patterns in the data, but it also requires estimating more parameters, which means it needs more data to perform well and is more prone to overfitting when the sample size is small.</p>
+<p><strong>Naive Bayes</strong> is another Bayes’ theorem-based method, but it makes a different simplifying assumption: it assumes that the independent variables are independent of each other within each class. This assumption is almost never literally true, but it has the enormous practical advantage of reducing the number of parameters that must be estimated. Instead of estimating a full covariance matrix, naive Bayes estimates only the marginal distribution of each predictor within each class. This makes it very efficient and particularly useful when the number of predictors is large relative to the number of observations.</p>
+<p><strong>K-nearest neighbours</strong> (KNN) is a non-parametric method that makes no assumptions about the form of the decision boundary or the distribution of the predictors. To classify a new observation, it simply looks at the K observations in the training data that are most similar to the new observation (in terms of their predictor values) and assigns the new observation to the most common class among those neighbours. The method is intuitive and highly flexible, but its performance depends heavily on the choice of K and on the scale of the predictor variables.</p>
+<p>While these five methods form the core of the classification, the field of classification is much broader, and it is useful to be aware of some other important approaches. Decision trees classify observations by recursively splitting the predictor space into regions based on simple rules applied to individual predictors. The result is an intuitive tree-like structure where each internal node represents a test on a predictor, each branch represents an outcome of that test, and each leaf represents a class prediction. Decision trees are easy to interpret but can be unstable and prone to overfitting. Random forests and boosting are ensemble methods that improve on single decision trees by combining many trees together. Random forests build a large number of trees on random subsets of the data and predictors, and then aggregate their predictions by majority vote. Boosting builds trees sequentially, with each new tree focusing on the observations that the previous trees misclassified. Both methods are among the most powerful general-purpose classifiers available. Support vector machines (SVMs) construct a decision boundary by finding the hyperplane that maximises the margin between classes. They can be extended to handle non-linear boundaries through the use of kernel functions. SVMs are particularly effective in high-dimensional settings. Neural networks and deep learning are highly flexible models that learn complex, non-linear relationships between predictors and the response through layers of interconnected nodes. They are the foundation of modern machine learning and are particularly powerful for tasks involving images, text, and other unstructured data, but they can also be applied to structured datasets like ours. Each of these methods has its strengths, weaknesses, and assumptions, and part of the skill of statistical learning is knowing which method is appropriate for a given problem.</p>
+<section id="logistic-regression" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="logistic-regression"><span class="header-section-number">1</span> Logistic regression</h2>
+<p><strong>Logistic regression</strong> is the most widely used classification method in the social sciences, and for good reason. It is a method that allows us to model the relationship between a set of independent variables and a binary categorical dependent variable - that is, a response variable that takes one of two possible values. In our bank marketing example, the response variable is whether a client subscribed to a term deposit or did not, and the predictors include demographic characteristics like age and education, financial indicators like account balance, and campaign-related variables like the duration of the last phone call.</p>
+<p>The fundamental idea behind logistic regression is that rather than trying to predict the category itself directly, we instead model the probability that an observation belongs to a particular category. Specifically, we model the probability that the response variable equals “yes” given the values of the predictors. Once we have estimated this probability, classification becomes straightforward: if the estimated probability is above a certain threshold (typically 0.5), we classify the observation as “yes,” and if it is below that threshold, we classify it as “no.”</p>
+<p>What makes logistic regression different from linear regression is the way it connects the predictors to the response. In linear regression, we model the expected value of a continuous response as a linear combination of the predictors, and the predicted values can range from negative infinity to positive infinity. But when the response is a probability, this is not acceptable - probabilities must lie between 0 and 1. Logistic regression solves this problem by using a special mathematical function, the <strong>logistic function</strong>, to transform the linear combination of predictors into a value that is guaranteed to fall within the interval from 0 to 1. This is the core innovation that makes logistic regression work.</p>
+<p>To appreciate why the logistic function is necessary, let us first consider what happens if we naively model the probability of subscription as a linear function of a predictor. Suppose we use only one predictor, the duration of the last phone call. A linear model would look like this: the probability that a client subscribes equals some intercept plus a slope coefficient multiplied by duration. The problem is immediately apparent - for very short calls, this model might predict negative probabilities, and for very long calls, it might predict probabilities greater than one. Neither of these outcomes makes any sense.</p>
+<p>The <strong>logistic function</strong> provides an elegant solution. Instead of modelling the probability as a straight line, we model it as a curve that is shaped like an elongated S. The mathematical form of the logistic function is as follows: the probability that the response equals “yes” given a predictor X is equal to the exponential of the linear combination (beta zero plus beta one times X) divided by one plus that same exponential. Written symbolically, this is:</p>
+<p><span class="math display">\[
+p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1X}}
+\]</span></p>
+<p>This function has a very important property: no matter what values the coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> take, and no matter what value X takes, the output of the logistic function is always between 0 and 1. When the linear combination <span class="math inline">\(\beta_0 + \beta_1X\)</span> is a very large positive number, the exponential dominates and the function approaches 1. When the linear combination is a very large negative number, the exponential approaches 0 and the function approaches 0. When the linear combination equals 0, the function returns exactly 0.5. This S-shaped curve therefore provides a natural and mathematically well-behaved way to model probabilities.</p>
+<p>To understand the coefficients of a logistic regression model, we need to introduce two related concepts: the odds and the log-odds. The <strong>odds of an event</strong> are defined as the probability that the event occurs divided by the probability that it does not occur. If the probability that a client subscribes is p, then the odds of subscription are <span class="math inline">\(p / (1 - p)\)</span>. Odds are a familiar concept in everyday language - when we say that the odds of something are 3 to 1, we mean that the event is three times more likely to happen than not to happen. Unlike probabilities, which are bounded between 0 and 1, odds can range from 0 to positive infinity. An odds of 1 means the event is equally likely to occur or not occur; an odds greater than 1 means the event is more likely than not; and an odds less than 1 means the event is less likely than not.</p>
+<p>Now, if we take the logistic model and rearrange it algebraically, we can show that the odds are equal to the exponential of the linear combination:</p>
+<p><span class="math display">\[
+\frac{p(X)}{1 − p(X)} = e^{\beta_0 + \beta_1X}
+\]</span></p>
+<p>If we then take the natural logarithm of both sides, we get:</p>
+<p><span class="math display">\[
+log(\frac{p(X)}{1 − p(X)}) = \beta_0 + \beta_1X
+\]</span></p>
+<p>The left-hand side of this equation - the logarithm of the odds - is called the log-odds or, equivalently, the <strong>logit</strong>. This is an extremely important result because it tells us that in a logistic regression model, the log-odds of the response is a linear function of the predictors. This is why the method is called logistic regression: the logit is linear in the predictors, just as the response itself is linear in the predictors in ordinary linear regression.</p>
+<p>The practical interpretation of the slope coefficient <span class="math inline">\(\beta_1\)</span> is as follows: a one-unit increase in the predictor X is associated with a change of <span class="math inline">\(\beta_1\)</span> in the log-odds of the response. Equivalently, a one-unit increase in X multiplies the odds by a factor of <span class="math inline">\(e^\beta_1\)</span>. This multiplicative interpretation of the coefficients in terms of odds ratios is central to how logistic regression results are reported and interpreted in the social sciences.</p>
+<p>It is important to note that although the logit is linear in the predictors, the probability itself is not. The relationship between a predictor and the probability of the outcome is always non-linear and S-shaped. This means that the effect of a one-unit increase in a predictor on the probability depends on the current value of that predictor. Near the extremes of the probability scale (close to 0 or close to 1), changes in the predictor have relatively little effect on the probability, while near the middle of the scale (around 0.5), the same change in the predictor has a much larger effect.</p>
+<p>Let us now fit a simple logistic regression model using the <code>bank_dataset</code>, predicting subscription to a term deposit based solely on the duration of the last phone call. In R, logistic regression is fitted using the <code>glm()</code> function with the argument <code>family = binomial</code>.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled" title="Example: Simple Logistic Regression">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Example: Simple Logistic Regression
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The glm() function stands for generalised linear model, and by specifying <code>family = binomial</code>, we tell R that we want to fit a logistic regression. The formula <code>y ~ duration</code> specifies that we are modelling the response variable <code>y</code> as a function of the single predictor <code>duration</code>. When you run this code and call <code>summary()</code>, R will display the estimated coefficients, their standard errors, z-values, and p-values.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>logistic_simple <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  y <span class="sc">~</span> duration,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> bank_dataset,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> binomial</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(logistic_simple)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = y ~ duration, family = binomial, data = bank_dataset)
+
+Coefficients:
+              Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept) -3.193e+00  2.613e-02 -122.19   &lt;2e-16 ***
+duration     3.529e-03  5.482e-05   64.38   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 32631  on 45210  degrees of freedom
+Residual deviance: 27502  on 45209  degrees of freedom
+AIC: 27506
+
+Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>In linear regression, the coefficients are estimated by the method of least squares, which finds the values of the coefficients that minimise the sum of squared differences between the observed and predicted values. In logistic regression, a different estimation method is used: <strong>maximum likelihood estimation</strong>. The intuition behind maximum likelihood is elegant. We want to find the values of the coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that make the observed data as probable as possible. For each observation in our dataset, the model gives us a predicted probability that the client subscribes. For clients who actually did subscribe, we want this predicted probability to be high. For clients who did not subscribe, we want this predicted probability to be low (or equivalently, we want the predicted probability of not subscribing to be high). The likelihood function captures this idea formally: it is the product of the predicted probabilities for all the observations, where for each observation we use the predicted probability of the outcome that actually occurred.</p>
+<p><strong>Maximum likelihood estimation</strong> finds the values of <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that maximise this likelihood function. In practice, because working with products of many small probabilities is numerically inconvenient, we work with the logarithm of the likelihood - the <strong>log-likelihood</strong> - and maximise that instead. The maximisation is performed using an iterative numerical algorithm (typically iteratively reweighted least squares), which is handled automatically by the <code>glm()</code> function in R.</p>
+<p>The key output of the estimation process is the set of estimated coefficients, along with their standard errors. The standard errors measure the uncertainty in the coefficient estimates, and they are used to construct confidence intervals and hypothesis tests. The z-statistic reported in the summary output is computed by dividing each estimated coefficient by its standard error, and the associated p-value tests the null hypothesis that the true coefficient is equal to zero - that is, that the predictor has no effect on the log-odds of the response.</p>
+<p>Once we have fitted a logistic regression model, we can use it to make predictions for new observations. In R, the <code>predict()</code> function is used for this purpose. By default, <code>predict()</code> applied to a glm object returns the predicted values on the scale of the linear predictor - that is, the predicted log-odds. To obtain predicted probabilities, we must specify <code>type = "response"</code>.</p>
+<div class="callout callout-style-default callout-tip no-icon callout-titled" title="Example: Making Predictions">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Example: Making Predictions
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>predicted_probabilities <span class="ot">&lt;-</span> <span class="fu">predict</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  logistic_simple,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(predicted_probabilities)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         1          2          3          4          5          6 
+0.09352110 0.06539995 0.05096579 0.05376734 0.07629941 0.06285851 </code></pre>
+</div>
+</div>
+<p>This code produces the estimated probability of subscribing to the term deposit for each client in the dataset. Each value will be a number between 0 and 1. To convert these probabilities into class predictions, we apply a threshold - typically 0.5.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>predicted_class <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(predicted_probabilities <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">"yes"</span>, <span class="st">"no"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">Predicted =</span> predicted_class, <span class="at">Actual =</span> bank_dataset<span class="sc">$</span>y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Actual
+Predicted    no   yes
+      no  39351  4465
+      yes   571   824</code></pre>
+</div>
+</div>
+<p>This produces a confusion matrix, which is a cross-tabulation of the predicted class labels against the actual class labels. The confusion matrix tells us how many clients were correctly classified and how many were misclassified. We will explore the confusion matrix and related performance metrics in more detail later, but for now it is important to understand that this is the basic workflow of logistic regression: fit the model, extract predicted probabilities, apply a threshold, and evaluate the results.</p>
+<p>We can also make predictions for specific hypothetical clients. Suppose we want to know the predicted probability of subscription for a client whose last call lasted 300 seconds:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>new_client <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">duration =</span> <span class="dv">300</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(logistic_simple, <span class="at">newdata =</span> new_client, <span class="at">type =</span> <span class="st">"response"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        1 
+0.1058604 </code></pre>
+</div>
+</div>
+<p>This will return a single probability representing the model’s estimate of how likely it is that a client with a 300-second phone call will subscribe to the term deposit.</p>
+</div>
+</div>
+</div>
+<section id="multiple-logistic-regression" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="multiple-logistic-regression"><span class="header-section-number">1.1</span> Multiple Logistic Regression</h3>
 
 
 <!-- -->
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -691,16 +933,209 @@ background: #00868B;
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Classification"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> ""</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner:</span><span class="co"> "#00868B"</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner-color:</span><span class="co"> "white"</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">crossref:</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">  fig-title: "Figure"</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">  tbl-title: "Table"</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Classification"</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> ""</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> true</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner:</span><span class="co"> "#00868B"</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="an">title-block-banner-color:</span><span class="co"> "white"</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="an">crossref:</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">  fig-title: "Figure"</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">  tbl-title: "Table"</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>bank_dataset <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"datasets/bank-full.csv"</span>, <span class="at">sep =</span> <span class="st">";"</span>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>y)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>job <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>job)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>marital <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>marital)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>education <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>education)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>default <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>default)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>housing <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>housing)</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>loan <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>loan)</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>contact <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>contact)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>month <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>month)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>bank_dataset<span class="sc">$</span>poutcome <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bank_dataset<span class="sc">$</span>poutcome)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>::: {.callout-note icon="false" collapse="true" title="Dataset: <span class="in">`bank_dataset`</span>"}</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>The <span class="in">`bank_dataset`</span> dataset is a social and behavioral dataset that seeks to capture the demographic, financial, and campaign-related factors that influence whether a bank client decides to subscribe to a term deposit following a direct marketing campaign. The fundamental research question behind this dataset is: *what characteristics of a client and of the marketing contact predict the decision to subscribe to a financial product, and how strongly does each factor contribute?* This dataset is publicly available on the <span class="co">[</span><span class="ot">UCI Machine Learning Repository</span><span class="co">](https://archive.ics.uci.edu/dataset/222/bank+marketing)</span>. The dataset contains 4,521 observations, where each observation represents one individual client contacted during a phone-based marketing campaign run by a Portuguese banking institution. For each client, 17 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 16 are potential predictors (independent variables). The variables are as follows:</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`age`</span> records the age of the client in years,</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`job`</span> describes the type of occupation of the client within the different categories,</span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`marital`</span> records the marital status of the client, categorized as married, single, or divorced (where divorced also includes widowed),</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`education`</span> indicates the highest level of education the client has completed, with categories primary, secondary, and tertiary,</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`default`</span> indicates whether the client has credit currently in default (<span class="in">`yes`</span> or <span class="in">`no`</span>),</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`balance`</span> records the average annual balance held in the client's bank account, measured in euros,</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`housing`</span> indicates whether the client has an active housing loan (<span class="in">`yes`</span> or <span class="in">`no`</span>),</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`loan`</span> indicates whether the client has an active personal loan (<span class="in">`yes`</span> or <span class="in">`no`</span>),</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`contact`</span> describes the type of communication channel used to contact the client, with categories cellular, telephone, and unknown,</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`day`</span> records the day of the month on which the client was last contacted,</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`month`</span> records the month of the year in which the client was last contacted,</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`duration`</span> records the duration of the last contact with the client in seconds (this variable is only known after the call has ended, and therefore should be used with caution in predictive modeling),</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`campaign`</span> records the total number of times the client was contacted during the current marketing campaign,</span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`pdays`</span> records the number of days that elapsed since the client was last contacted in a previous campaign (-1 indicates the client had not been previously contacted),</span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`previous`</span> records the total number of times the client was contacted before the current campaign,</span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`poutcome`</span> describes the outcome of the previous marketing campaign for this client, with categories success, failure, other, and unknown,</span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`y`</span> records whether the client ultimately subscribed to the term deposit (<span class="in">`yes`</span> or <span class="in">`no`</span>), and this is the outcome variable we aim to predict.</span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bank_dataset)</span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a>Statistical learning is a broad field concerned with understanding the relationship between a set of independent variables and dependent variable. The central question in statistical learning is always the same: *given what we know about a person, an observation, or a case through its predictor values, what can we say about the response?* The methods we use to answer this question fall into two major families, and the distinction between them depends entirely on the nature of the response variable.</span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>When the response variable is quantitative - meaning it takes on numerical values along a continuous scale, such as income in euros, blood pressure in millimetres of mercury, or a score on a psychological test - we are dealing with a regression problem. Linear regression, covered in the earlier chapter, is the most classical tool for this kind of problem. It fits a model that predicts a numerical outcome as a linear combination of the independent variables, and the dependent variable is a number that can, in principle, take any value on the real number line.</span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>However, in a great many research situations the dependent variable is not quantitative but qualitative. A qualitative independent variable, also called a **categorical variable**, takes on values from a finite, unordered set of categories. For instance, a medical diagnosis might be "disease present" or "disease absent". A survey respondent might identify as "satisfied", "neutral", or "dissatisfied". A voter might choose among several political parties. In all of these situations, the response is not a number on a scale but a label indicating membership in a group. The task of predicting which category a new observation belongs to is what we call **classification**, and the methods designed for this task are called **classifiers**.</span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>Classification therefore occupies a position within statistical learning that is parallel to regression. If regression answers the question "how much" then classification answers the question "which one" Both regression and classification are forms of supervised learning, meaning that we have a training dataset in which both the predictors and the true response are known, and we use this dataset to build a model that can make predictions for new observations whose response we do not yet know. The difference is simply in the type of response we are trying to predict.</span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>Imagine that our response variable has two categories, which we code numerically as 0 and 1. For example, in our heart disease dataset, we might code "No disease" as 0 and "Disease present" as 1. One might think that we could simply fit a linear regression model with this 0/1 variable as the response, and then use the fitted values as predicted probabilities. If the model predicts a value close to 1 for a given patient, we would classify that patient as having heart disease, and if it predicts a value close to 0, we would classify the patient as healthy. The problem with this approach is that linear regression does not know that the response is a probability. A linear regression model produces fitted values by computing a linear combination of the predictors, and there is nothing in the mathematics of linear regression that constrains these fitted values to fall between 0 and 1. In practice, for some combinations of predictor values, the model will produce predictions that are less than 0 or greater than 1. These values cannot be interpreted as probabilities, and they make no logical sense in the context of classification.</span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>The situation becomes even more problematic when the response variable has more than two categories. Suppose we are predicting a patient's diagnosis and the possible outcomes are "mild condition", "moderate condition", and "severe condition." To use linear regression, we would need to assign numerical codes to these categories - say 1, 2, and 3. But this coding implies that the difference between mild and moderate is the same as the difference between moderate and severe, and it implies a specific ordering. If we had instead used the codes 1, 2, and 4, the model would produce different results, even though the underlying categories have not changed. For a truly nominal variable with no natural ordering - say, three types of chest pain - any numerical coding would impose a structure that simply does not exist in the data. This is a fundamental flaw that cannot be fixed by choosing a clever coding scheme.</span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>Classification methods avoid these problems entirely. Logistic regression, for example, models the probability of belonging to a particular class using a mathematical function - the logistic function - that is guaranteed to produce values between 0 and 1, no matter what values the predictors take. Discriminant analysis methods approach the problem from a different angle by modelling the distribution of the predictors within each class and then computing class probabilities using Bayes' theorem. In both cases, the output of the model is a set of well-defined probabilities that sum to one across the possible classes, and the final classification is made by assigning each observation to the class with the highest estimated probability.</span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>Our bank marketing dataset provides a perfect illustration of a classification problem. We have 4,521 individuals, and for each individual we have recorded 16 predictor variables that capture various aspects of their demographic profile, financial situation, and interactions with the marketing campaign — their age, type of occupation, marital status, highest level of education, whether they have credit in default, their average annual bank balance in euros, whether they hold a housing loan, whether they hold a personal loan, the communication channel used to contact them, the day and month of last contact, the duration of the last phone call in seconds, the number of times they were contacted during the current campaign, the number of days since they were last contacted in a previous campaign, the number of times they were contacted before the current campaign, and the outcome of the previous marketing campaign. The response variable is whether or not the client subscribed to a term deposit, recorded as a binary outcome: "no" for clients who did not subscribe and "yes" for those who did.</span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>The classification task here is straightforward to state: given the 16 demographic, financial, and campaign-related measurements for a new client, we want to predict whether that client will subscribe to the term deposit or not. But although the question is simple, the methodology must be chosen carefully. We need a method that will estimate the probability that a given client belongs to the "yes" group versus the "no" group, and we need to evaluate how accurately that method performs so that we can trust its predictions in a marketing, business, or social research context.</span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a>In practice, we would proceed by first splitting the data or using resampling methods to assess how well our chosen classifier generalises to new observations. We would fit the classification model on a training portion of the data, obtain predicted class probabilities for each observation in the test portion, assign each observation to the class with the highest probability, and then evaluate performance using tools such as the confusion matrix and the ROC curve. We might try several different classification methods - logistic regression, linear discriminant analysis, quadratic discriminant analysis, naive Bayes, K-nearest neighbours - and compare their performance to determine which one is most appropriate for this particular dataset.</span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a>There are more classification methods and the field of classification is rich and rapidly evolving. However, the five methods - logistic regression, linear discriminant analysis, quadratic discriminant analysis, naive Bayes, and K-nearest neighbours - are among the most widely used and foundational techniques in the social sciences. They provide a solid starting point for understanding the principles of classification.</span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a>**Logistic regression** is the most widely used classification method in the social sciences conceptually close to linear regression. It directly models the probability that the response belongs to a particular class by applying the logistic function to a linear combination of the predictors. The result is a model in which the log-odds of belonging to one class versus the other is a linear function of the predictors. The coefficients are estimated using maximum likelihood, and they can be interpreted in terms of how each predictor affects the odds of the outcome.</span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a>**Linear discriminant analysis** (LDA) takes a different approach. Instead of modelling the probability of class membership directly, it models the distribution of the predictor variables within each class. Specifically, it assumes that the predictors follow a multivariate normal distribution within each class and that all classes share the same covariance matrix. Using Bayes' theorem, it then computes the posterior probability that a new observation belongs to each class. Because of the shared covariance assumption, the decision boundaries between classes are linear. LDA is particularly useful when the classes are well separated and when the normality assumption is approximately met.</span>
+<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a>**Quadratic discriminant analysis** (QDA) is a generalisation of LDA that relaxes the shared covariance assumption. Each class is allowed to have its own covariance matrix, which means the decision boundaries between classes can be curved rather than straight. This gives QDA more flexibility to capture complex patterns in the data, but it also requires estimating more parameters, which means it needs more data to perform well and is more prone to overfitting when the sample size is small.</span>
+<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a>**Naive Bayes** is another Bayes' theorem-based method, but it makes a different simplifying assumption: it assumes that the independent variables are independent of each other within each class. This assumption is almost never literally true, but it has the enormous practical advantage of reducing the number of parameters that must be estimated. Instead of estimating a full covariance matrix, naive Bayes estimates only the marginal distribution of each predictor within each class. This makes it very efficient and particularly useful when the number of predictors is large relative to the number of observations.</span>
+<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a>**K-nearest neighbours** (KNN) is a non-parametric method that makes no assumptions about the form of the decision boundary or the distribution of the predictors. To classify a new observation, it simply looks at the K observations in the training data that are most similar to the new observation (in terms of their predictor values) and assigns the new observation to the most common class among those neighbours. The method is intuitive and highly flexible, but its performance depends heavily on the choice of K and on the scale of the predictor variables.</span>
+<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a>While these five methods form the core of the classification, the field of classification is much broader, and it is useful to be aware of some other important approaches. Decision trees classify observations by recursively splitting the predictor space into regions based on simple rules applied to individual predictors. The result is an intuitive tree-like structure where each internal node represents a test on a predictor, each branch represents an outcome of that test, and each leaf represents a class prediction. Decision trees are easy to interpret but can be unstable and prone to overfitting. Random forests and boosting are ensemble methods that improve on single decision trees by combining many trees together. Random forests build a large number of trees on random subsets of the data and predictors, and then aggregate their predictions by majority vote. Boosting builds trees sequentially, with each new tree focusing on the observations that the previous trees misclassified. Both methods are among the most powerful general-purpose classifiers available. Support vector machines (SVMs) construct a decision boundary by finding the hyperplane that maximises the margin between classes. They can be extended to handle non-linear boundaries through the use of kernel functions. SVMs are particularly effective in high-dimensional settings. Neural networks and deep learning are highly flexible models that learn complex, non-linear relationships between predictors and the response through layers of interconnected nodes. They are the foundation of modern machine learning and are particularly powerful for tasks involving images, text, and other unstructured data, but they can also be applied to structured datasets like ours. Each of these methods has its strengths, weaknesses, and assumptions, and part of the skill of statistical learning is knowing which method is appropriate for a given problem.</span>
+<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a><span class="fu">## Logistic regression</span></span>
+<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a>**Logistic regression** is the most widely used classification method in the social sciences, and for good reason. It is a method that allows us to model the relationship between a set of independent variables and a binary categorical dependent variable - that is, a response variable that takes one of two possible values. In our bank marketing example, the response variable is whether a client subscribed to a term deposit or did not, and the predictors include demographic characteristics like age and education, financial indicators like account balance, and campaign-related variables like the duration of the last phone call.</span>
+<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a>The fundamental idea behind logistic regression is that rather than trying to predict the category itself directly, we instead model the probability that an observation belongs to a particular category. Specifically, we model the probability that the response variable equals "yes" given the values of the predictors. Once we have estimated this probability, classification becomes straightforward: if the estimated probability is above a certain threshold (typically 0.5), we classify the observation as "yes," and if it is below that threshold, we classify it as "no."</span>
+<span id="cb11-117"><a href="#cb11-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a>What makes logistic regression different from linear regression is the way it connects the predictors to the response. In linear regression, we model the expected value of a continuous response as a linear combination of the predictors, and the predicted values can range from negative infinity to positive infinity. But when the response is a probability, this is not acceptable - probabilities must lie between 0 and 1. Logistic regression solves this problem by using a special mathematical function, the **logistic function**, to transform the linear combination of predictors into a value that is guaranteed to fall within the interval from 0 to 1. This is the core innovation that makes logistic regression work.</span>
+<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a>To appreciate why the logistic function is necessary, let us first consider what happens if we naively model the probability of subscription as a linear function of a predictor. Suppose we use only one predictor, the duration of the last phone call. A linear model would look like this: the probability that a client subscribes equals some intercept plus a slope coefficient multiplied by duration. The problem is immediately apparent - for very short calls, this model might predict negative probabilities, and for very long calls, it might predict probabilities greater than one. Neither of these outcomes makes any sense.</span>
+<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a>The **logistic function** provides an elegant solution. Instead of modelling the probability as a straight line, we model it as a curve that is shaped like an elongated S. The mathematical form of the logistic function is as follows: the probability that the response equals "yes" given a predictor X is equal to the exponential of the linear combination (beta zero plus beta one times X) divided by one plus that same exponential. Written symbolically, this is:</span>
+<span id="cb11-123"><a href="#cb11-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-124"><a href="#cb11-124" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb11-125"><a href="#cb11-125" aria-hidden="true" tabindex="-1"></a>p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1X}}</span>
+<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-128"><a href="#cb11-128" aria-hidden="true" tabindex="-1"></a>This function has a very important property: no matter what values the coefficients $\beta_0$ and $\beta_1$ take, and no matter what value X takes, the output of the logistic function is always between 0 and 1. When the linear combination $\beta_0 + \beta_1X$ is a very large positive number, the exponential dominates and the function approaches 1. When the linear combination is a very large negative number, the exponential approaches 0 and the function approaches 0. When the linear combination equals 0, the function returns exactly 0.5. This S-shaped curve therefore provides a natural and mathematically well-behaved way to model probabilities.</span>
+<span id="cb11-129"><a href="#cb11-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-130"><a href="#cb11-130" aria-hidden="true" tabindex="-1"></a>To understand the coefficients of a logistic regression model, we need to introduce two related concepts: the odds and the log-odds.</span>
+<span id="cb11-131"><a href="#cb11-131" aria-hidden="true" tabindex="-1"></a>The **odds of an event** are defined as the probability that the event occurs divided by the probability that it does not occur. If the probability that a client subscribes is p, then the odds of subscription are $p / (1 - p)$. Odds are a familiar concept in everyday language - when we say that the odds of something are 3 to 1, we mean that the event is three times more likely to happen than not to happen. Unlike probabilities, which are bounded between 0 and 1, odds can range from 0 to positive infinity. An odds of 1 means the event is equally likely to occur or not occur; an odds greater than 1 means the event is more likely than not; and an odds less than 1 means the event is less likely than not.</span>
+<span id="cb11-132"><a href="#cb11-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-133"><a href="#cb11-133" aria-hidden="true" tabindex="-1"></a>Now, if we take the logistic model and rearrange it algebraically, we can show that the odds are equal to the exponential of the linear combination:</span>
+<span id="cb11-134"><a href="#cb11-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-135"><a href="#cb11-135" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb11-136"><a href="#cb11-136" aria-hidden="true" tabindex="-1"></a>\frac{p(X)}{1 − p(X)} = e^{\beta_0 + \beta_1X}</span>
+<span id="cb11-137"><a href="#cb11-137" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb11-138"><a href="#cb11-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-139"><a href="#cb11-139" aria-hidden="true" tabindex="-1"></a>If we then take the natural logarithm of both sides, we get:</span>
+<span id="cb11-140"><a href="#cb11-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-141"><a href="#cb11-141" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb11-142"><a href="#cb11-142" aria-hidden="true" tabindex="-1"></a>log(\frac{p(X)}{1 − p(X)}) = \beta_0 + \beta_1X</span>
+<span id="cb11-143"><a href="#cb11-143" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb11-144"><a href="#cb11-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-145"><a href="#cb11-145" aria-hidden="true" tabindex="-1"></a>The left-hand side of this equation - the logarithm of the odds - is called the log-odds or, equivalently, the **logit**. This is an extremely important result because it tells us that in a logistic regression model, the log-odds of the response is a linear function of the predictors. This is why the method is called logistic regression: the logit is linear in the predictors, just as the response itself is linear in the predictors in ordinary linear regression.</span>
+<span id="cb11-146"><a href="#cb11-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-147"><a href="#cb11-147" aria-hidden="true" tabindex="-1"></a>The practical interpretation of the slope coefficient $\beta_1$ is as follows: a one-unit increase in the predictor X is associated with a change of $\beta_1$ in the log-odds of the response. Equivalently, a one-unit increase in X multiplies the odds by a factor of $e^\beta_1$. This multiplicative interpretation of the coefficients in terms of odds ratios is central to how logistic regression results are reported and interpreted in the social sciences.</span>
+<span id="cb11-148"><a href="#cb11-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-149"><a href="#cb11-149" aria-hidden="true" tabindex="-1"></a>It is important to note that although the logit is linear in the predictors, the probability itself is not. The relationship between a predictor and the probability of the outcome is always non-linear and S-shaped. This means that the effect of a one-unit increase in a predictor on the probability depends on the current value of that predictor. Near the extremes of the probability scale (close to 0 or close to 1), changes in the predictor have relatively little effect on the probability, while near the middle of the scale (around 0.5), the same change in the predictor has a much larger effect.</span>
+<span id="cb11-150"><a href="#cb11-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-151"><a href="#cb11-151" aria-hidden="true" tabindex="-1"></a>Let us now fit a simple logistic regression model using the <span class="in">`bank_dataset`</span>, predicting subscription to a term deposit based solely on the duration of the last phone call. In R, logistic regression is fitted using the <span class="in">`glm()`</span> function with the argument <span class="in">`family = binomial`</span>.</span>
+<span id="cb11-152"><a href="#cb11-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-153"><a href="#cb11-153" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip icon="false" collapse="true" title="Example: Simple Logistic Regression"}</span>
+<span id="cb11-154"><a href="#cb11-154" aria-hidden="true" tabindex="-1"></a>The glm() function stands for generalised linear model, and by specifying <span class="in">`family = binomial`</span>, we tell R that we want to fit a logistic regression. The formula <span class="in">`y ~ duration`</span> specifies that we are modelling the response variable <span class="in">`y`</span> as a function of the single predictor <span class="in">`duration`</span>. When you run this code and call <span class="in">`summary()`</span>, R will display the estimated coefficients, their standard errors, z-values, and p-values.</span>
+<span id="cb11-155"><a href="#cb11-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-158"><a href="#cb11-158" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-159"><a href="#cb11-159" aria-hidden="true" tabindex="-1"></a>logistic_simple <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
+<span id="cb11-160"><a href="#cb11-160" aria-hidden="true" tabindex="-1"></a>  y <span class="sc">~</span> duration,</span>
+<span id="cb11-161"><a href="#cb11-161" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> bank_dataset,</span>
+<span id="cb11-162"><a href="#cb11-162" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> binomial</span>
+<span id="cb11-163"><a href="#cb11-163" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-164"><a href="#cb11-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-165"><a href="#cb11-165" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(logistic_simple)</span>
+<span id="cb11-166"><a href="#cb11-166" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-167"><a href="#cb11-167" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb11-168"><a href="#cb11-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-169"><a href="#cb11-169" aria-hidden="true" tabindex="-1"></a>In linear regression, the coefficients are estimated by the method of least squares, which finds the values of the coefficients that minimise the sum of squared differences between the observed and predicted values. In logistic regression, a different estimation method is used: **maximum likelihood estimation**. The intuition behind maximum likelihood is elegant. We want to find the values of the coefficients $\beta_0$ and $\beta_1$ that make the observed data as probable as possible. For each observation in our dataset, the model gives us a predicted probability that the client subscribes. For clients who actually did subscribe, we want this predicted probability to be high. For clients who did not subscribe, we want this predicted probability to be low (or equivalently, we want the predicted probability of not subscribing to be high). The likelihood function captures this idea formally: it is the product of the predicted probabilities for all the observations, where for each observation we use the predicted probability of the outcome that actually occurred.</span>
+<span id="cb11-170"><a href="#cb11-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-171"><a href="#cb11-171" aria-hidden="true" tabindex="-1"></a>**Maximum likelihood estimation** finds the values of $\beta_0$ and $\beta_1$ that maximise this likelihood function. In practice, because working with products of many small probabilities is numerically inconvenient, we work with the logarithm of the likelihood - the **log-likelihood** - and maximise that instead. The maximisation is performed using an iterative numerical algorithm (typically iteratively reweighted least squares), which is handled automatically by the <span class="in">`glm()`</span> function in R.</span>
+<span id="cb11-172"><a href="#cb11-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-173"><a href="#cb11-173" aria-hidden="true" tabindex="-1"></a>The key output of the estimation process is the set of estimated coefficients, along with their standard errors. The standard errors measure the uncertainty in the coefficient estimates, and they are used to construct confidence intervals and hypothesis tests. The z-statistic reported in the summary output is computed by dividing each estimated coefficient by its standard error, and the associated p-value tests the null hypothesis that the true coefficient is equal to zero - that is, that the predictor has no effect on the log-odds of the response.</span>
+<span id="cb11-174"><a href="#cb11-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-175"><a href="#cb11-175" aria-hidden="true" tabindex="-1"></a>Once we have fitted a logistic regression model, we can use it to make predictions for new observations. In R, the <span class="in">`predict()`</span> function is used for this purpose. By default, <span class="in">`predict()`</span> applied to a glm object returns the predicted values on the scale of the linear predictor - that is, the predicted log-odds. To obtain predicted probabilities, we must specify <span class="in">`type = "response"`</span>.</span>
+<span id="cb11-176"><a href="#cb11-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-177"><a href="#cb11-177" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip icon="false" collapse="true" title="Example: Making Predictions"}</span>
+<span id="cb11-180"><a href="#cb11-180" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-181"><a href="#cb11-181" aria-hidden="true" tabindex="-1"></a>predicted_probabilities <span class="ot">&lt;-</span> <span class="fu">predict</span>(</span>
+<span id="cb11-182"><a href="#cb11-182" aria-hidden="true" tabindex="-1"></a>  logistic_simple,</span>
+<span id="cb11-183"><a href="#cb11-183" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"response"</span></span>
+<span id="cb11-184"><a href="#cb11-184" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-185"><a href="#cb11-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-186"><a href="#cb11-186" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(predicted_probabilities)</span>
+<span id="cb11-187"><a href="#cb11-187" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-188"><a href="#cb11-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-189"><a href="#cb11-189" aria-hidden="true" tabindex="-1"></a>This code produces the estimated probability of subscribing to the term deposit for each client in the dataset. Each value will be a number between 0 and 1. To convert these probabilities into class predictions, we apply a threshold - typically 0.5.</span>
+<span id="cb11-190"><a href="#cb11-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-193"><a href="#cb11-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-194"><a href="#cb11-194" aria-hidden="true" tabindex="-1"></a>predicted_class <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(predicted_probabilities <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">"yes"</span>, <span class="st">"no"</span>)</span>
+<span id="cb11-195"><a href="#cb11-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-196"><a href="#cb11-196" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">Predicted =</span> predicted_class, <span class="at">Actual =</span> bank_dataset<span class="sc">$</span>y)</span>
+<span id="cb11-197"><a href="#cb11-197" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-198"><a href="#cb11-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-199"><a href="#cb11-199" aria-hidden="true" tabindex="-1"></a>This produces a confusion matrix, which is a cross-tabulation of the predicted class labels against the actual class labels. The confusion matrix tells us how many clients were correctly classified and how many were misclassified. We will explore the confusion matrix and related performance metrics in more detail later, but for now it is important to understand that this is the basic workflow of logistic regression: fit the model, extract predicted probabilities, apply a threshold, and evaluate the results.</span>
+<span id="cb11-200"><a href="#cb11-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-201"><a href="#cb11-201" aria-hidden="true" tabindex="-1"></a>We can also make predictions for specific hypothetical clients. Suppose we want to know the predicted probability of subscription for a client whose last call lasted 300 seconds:</span>
+<span id="cb11-202"><a href="#cb11-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-205"><a href="#cb11-205" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-206"><a href="#cb11-206" aria-hidden="true" tabindex="-1"></a>new_client <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">duration =</span> <span class="dv">300</span>)</span>
+<span id="cb11-207"><a href="#cb11-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-208"><a href="#cb11-208" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(logistic_simple, <span class="at">newdata =</span> new_client, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb11-209"><a href="#cb11-209" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-210"><a href="#cb11-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-211"><a href="#cb11-211" aria-hidden="true" tabindex="-1"></a>This will return a single probability representing the model's estimate of how likely it is that a client with a 300-second phone call will subscribe to the term deposit.</span>
+<span id="cb11-212"><a href="#cb11-212" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb11-213"><a href="#cb11-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-214"><a href="#cb11-214" aria-hidden="true" tabindex="-1"></a><span class="fu">### Multiple Logistic Regression</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
