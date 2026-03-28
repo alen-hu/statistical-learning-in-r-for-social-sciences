@@ -200,3 +200,92 @@ This will return a single probability representing the model's estimate of how l
 :::
 
 ### Multiple Logistic Regression
+
+In practice, we almost never rely on a single predictor. Multiple logistic regression extends the simple logistic regression model to include several predictors simultaneously. The logistic model generalises naturally: the log-odds of the response is modelled as a linear combination of all the predictors. If we have p predictors, the model is:
+
+$$
+log(\frac{p(X)}{1 - p(X)}) = \beta_0 + \beta_0X_1 + \beta_2X_2 + ... + \beta_pX_p
+$$
+
+Each coefficient represents the change in the log-odds of the response associated with a one-unit increase in predictor, holding all other predictors constant. This "holding all other predictors constant" interpretation is exactly the same as in multiple linear regression, and it is one of the most important aspects of the model for social science research, because it allows us to isolate the effect of each predictor after controlling for the others.
+
+::: {.callout-tip icon="false" collapse="true" title="Example: Multiple Logistic Regression"}
+In this model, we are predicting subscription using a rich set of demographic, financial, and campaign-related variables. Notice that several of these predictors are categorical (such as `job`, `marital`, `education`, `housing`, `loan`, `contact`, and `poutcome`), and R automatically creates dummy variables for each category, choosing one category as the reference level.
+
+```{r}
+logistic_multiple <- glm(
+  y ~ age + job + marital + education + balance + housing + loan + contact + duration + campaign + poutcome,
+  data = bank_dataset,
+  family = binomial
+)
+
+summary(logistic_multiple)
+```
+
+We can also compute predicted probabilities and class predictions from the multiple model in the same way as before:
+
+```{r}
+predicted_probs_multiple <- predict(logistic_multiple, type = "response")
+
+predicted_class_multiple <- ifelse(predicted_probs_multiple > 0.5, "yes", "no")
+
+table(Predicted = predicted_class_multiple, Actual = bank_dataset$y)
+```
+:::
+
+An important point to emphasise is that the coefficients in a multiple logistic regression model can differ substantially from those in a simple logistic regression model using the same predictor. This is because the multiple model controls for confounding - the relationships among the predictors themselves. A predictor that appears highly significant on its own may become non-significant once other variables are included in the model, or vice versa. This is a well-known phenomenon in regression analysis and underscores the importance of fitting models with multiple predictors rather than drawing conclusions from a series of simple models.
+
+### Multinomial Logistic Regression
+
+Everything we have discussed so far applies to the case where the response variable has exactly two categories. But what happens when the response variable has three or more categories? This is where multinomial logistic regression comes in. **Multinomial logistic regression** is a generalisation of binary logistic regression to situations where the response variable has K categories, where K is greater than two. The idea is to choose one of the K categories as a baseline or reference category, and then fit $K - 1$ separate logistic regression equations, each of which models the log-odds of being in a particular category relative to the reference category.
+
+For example, suppose we had a response variable with three categories: "subscribed to product A", "subscribed to product B", and "did not subscribe". If we choose "did not subscribe" as the baseline, then we would fit two logistic equations: one for the log-odds of subscribing to product A versus not subscribing, and another for the log-odds of subscribing to product B versus not subscribing. Each equation has its own set of coefficients, and the predicted probability of each outcome is computed using a generalisation of the logistic function called the **softmax function**.
+
+The softmax function ensures that the predicted probabilities for all K categories sum to one for each observation. For an observation with predictor values X, the probability of belonging to class k (for $k = 1, ..., K-1$) relative to the baseline class K is:
+
+$$
+P(Y = k | X) = \frac{e^{\beta_{k0} + \beta_{k1}X_1 + ... + \beta_{kp}X_p}}{(1 + \sum_{l=1}^{K-1} e^(\beta_{l0} + \beta_{l1}X_1 + ... + \beta_{lp}X_p))}
+$$
+
+The probability of the baseline class is:
+
+$$
+P(Y = K | X) = \frac{1}{1 + \sum_{l=1}^{K-1} e^{\beta_{l0} + \beta_{l1}X_1 + ... + \beta_{lp}X_p}}
+$$
+
+The interpretation of coefficients in multinomial logistic regression follows the same logic as in binary logistic regression, except that each coefficient refers to the effect of a predictor on the log-odds of a specific category relative to the baseline. This means that the output is more complex, but the fundamental idea remains the same.
+
+In our bank dataset, the response variable `y` is binary, so we do not strictly need multinomial logistic regression. However, it is useful to see how it works in R, because many social science research questions involve multi-category outcomes. The `nnet` package in R provides the `multinom()` function for fitting multinomial logistic regression models.
+
+::: {.callout-tip icon="false" collapse="true" title="Example: Multinomial Logistic Regression"}
+In this case, because `y` has only two levels, the multinomial model will produce results that are equivalent to binary logistic regression. But if the response had three or more levels, the output would include a separate row of coefficients for each non-reference category. The `multinom()` function uses the first level of the factor as the reference category by default.
+
+```{r}
+library(nnet)
+
+multinomial_model <- multinom(
+  y ~ age + duration + balance + education,
+  data = bank_dataset
+)
+
+summary(multinomial_model)
+```
+
+To obtain predicted class probabilities from a multinomial model, we use:
+
+```{r}
+predicted_probs_multinomial <- predict(multinomial_model, type = "probs")
+
+head(predicted_probs_multinomial)
+```
+
+And to obtain predicted class labels:
+
+```{r}
+predicted_class_multinomial <- predict(multinomial_model, type = "class")
+
+table(Predicted = predicted_class_multinomial, Actual = bank_dataset$y)
+```
+:::
+
+## Generative Models for Classification
