@@ -14,23 +14,23 @@ crossref:
 
 library(tidyverse)
 
-bank_dataset <- read.csv("datasets/bank-full.csv", sep = ";")
+bank_marketing_dataset <- read.csv("datasets/bank-full.csv", sep = ";")
 
-bank_dataset$y <- as.factor(bank_dataset$y)
+bank_marketing_dataset$y <- as.factor(bank_marketing_dataset$y)
 
-bank_dataset$job <- as.factor(bank_dataset$job)
-bank_dataset$marital <- as.factor(bank_dataset$marital)
-bank_dataset$education <- as.factor(bank_dataset$education)
-bank_dataset$default <- as.factor(bank_dataset$default)
-bank_dataset$housing <- as.factor(bank_dataset$housing)
-bank_dataset$loan <- as.factor(bank_dataset$loan)
-bank_dataset$contact <- as.factor(bank_dataset$contact)
-bank_dataset$month <- as.factor(bank_dataset$month)
-bank_dataset$poutcome <- as.factor(bank_dataset$poutcome)
+bank_marketing_dataset$job <- as.factor(bank_marketing_dataset$job)
+bank_marketing_dataset$marital <- as.factor(bank_marketing_dataset$marital)
+bank_marketing_dataset$education <- as.factor(bank_marketing_dataset$education)
+bank_marketing_dataset$default <- as.factor(bank_marketing_dataset$default)
+bank_marketing_dataset$housing <- as.factor(bank_marketing_dataset$housing)
+bank_marketing_dataset$loan <- as.factor(bank_marketing_dataset$loan)
+bank_marketing_dataset$contact <- as.factor(bank_marketing_dataset$contact)
+bank_marketing_dataset$month <- as.factor(bank_marketing_dataset$month)
+bank_marketing_dataset$poutcome <- as.factor(bank_marketing_dataset$poutcome)
 ```
 
-::: {.callout-note icon="false" collapse="true" title="Dataset: `bank_dataset`"}
-The `bank_dataset` dataset is a social and behavioral dataset that seeks to capture the demographic, financial, and campaign-related factors that influence whether a bank client decides to subscribe to a term deposit following a direct marketing campaign. The fundamental research question behind this dataset is: *what characteristics of a client and of the marketing contact predict the decision to subscribe to a financial product, and how strongly does each factor contribute?* This dataset is publicly available on the [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/222/bank+marketing). The dataset contains 4,521 observations, where each observation represents one individual client contacted during a phone-based marketing campaign run by a Portuguese banking institution. For each client, 17 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 16 are potential predictors (independent variables). The variables are as follows:
+::: {.callout-note icon="false" collapse="true" title="Dataset: `bank_marketing_dataset`"}
+The `bank_marketing_dataset` dataset is a social and behavioral dataset that seeks to capture the demographic, financial, and campaign-related factors that influence whether a bank client decides to subscribe to a term deposit following a direct marketing campaign. The fundamental research question behind this dataset is: *what characteristics of a client and of the marketing contact predict the decision to subscribe to a financial product, and how strongly does each factor contribute?* This dataset is publicly available on the [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/222/bank+marketing). The dataset contains 4,521 observations, where each observation represents one individual client contacted during a phone-based marketing campaign run by a Portuguese banking institution. For each client, 17 variables have been recorded. One of these variables is the outcome we want to predict (dependent variable), and the remaining 16 are potential predictors (independent variables). The variables are as follows:
 
 - `age` records the age of the client in years,
 
@@ -40,13 +40,13 @@ The `bank_dataset` dataset is a social and behavioral dataset that seeks to capt
 
 - `education` indicates the highest level of education the client has completed, with categories primary, secondary, and tertiary,
 
-- `default` indicates whether the client has credit currently in default (`yes` or `no`),
+- `default` indicates whether the client has credit currently in default ("yes" or "no"),
 
 - `balance` records the average annual balance held in the client's bank account, measured in euros,
 
-- `housing` indicates whether the client has an active housing loan (`yes` or `no`),
+- `housing` indicates whether the client has an active housing loan ("yes" or "no"),
 
-- `loan` indicates whether the client has an active personal loan (`yes` or `no`),
+- `loan` indicates whether the client has an active personal loan ("yes" or "no"),
 
 - `contact` describes the type of communication channel used to contact the client, with categories cellular, telephone, and unknown,
 
@@ -64,44 +64,40 @@ The `bank_dataset` dataset is a social and behavioral dataset that seeks to capt
 
 - `poutcome` describes the outcome of the previous marketing campaign for this client, with categories success, failure, other, and unknown,
 
-- `y` records whether the client ultimately subscribed to the term deposit (`yes` or `no`), and this is the outcome variable we aim to predict.
+- `y` records whether the client ultimately subscribed to the term deposit ("yes" or "no"), and this is the outcome variable we aim to predict.
 
 ```{r}
-glimpse(bank_dataset)
+glimpse(bank_marketing_dataset)
 ```
 :::
 
 Statistical learning is a broad field concerned with understanding the relationship between a set of independent variables and dependent variable. The central question in statistical learning is always the same: *given what we know about a person, an observation, or a case through its predictor values, what can we say about the response?* The methods we use to answer this question fall into two major families, and the distinction between them depends entirely on the nature of the response variable.
 
-When the response variable is quantitative - meaning it takes on numerical values along a continuous scale, such as income in euros, blood pressure in millimetres of mercury, or a score on a psychological test - we are dealing with a regression problem. Linear regression, covered in the earlier chapter, is the most classical tool for this kind of problem. It fits a model that predicts a numerical outcome as a linear combination of the independent variables, and the dependent variable is a number that can, in principle, take any value on the real number line.
+When the response variable is quantitative, linear regression, covered in the earlier chapter, is the most classical tool for this kind of problem. It fits a model that predicts a numerical outcome as a linear combination of the independent variables, and the dependent variable is a number that can, in principle, take any value on the real number line. However, in a great many research situations the dependent variable is not quantitative but qualitative. A qualitative independent variable, also called a **categorical variable**, takes on values from a finite, unordered set of categories. For instance, a medical diagnosis might be "disease present" or "disease absent". A survey respondent might identify as "satisfied", "neutral", or "dissatisfied". A voter might choose among several political parties. In all of these situations, the response is not a number on a scale but a label indicating membership in a group. The task of predicting which category a new observation belongs to is what we call **classification**, and the methods designed for this task are called **classifiers**.
 
-However, in a great many research situations the dependent variable is not quantitative but qualitative. A qualitative independent variable, also called a **categorical variable**, takes on values from a finite, unordered set of categories. For instance, a medical diagnosis might be "disease present" or "disease absent". A survey respondent might identify as "satisfied", "neutral", or "dissatisfied". A voter might choose among several political parties. In all of these situations, the response is not a number on a scale but a label indicating membership in a group. The task of predicting which category a new observation belongs to is what we call **classification**, and the methods designed for this task are called **classifiers**.
+Classification therefore occupies a position within statistical learning that is parallel to regression. If regression answers the question "how much" then classification answers the question "which one". Both regression and classification are forms of supervised learning, meaning that we have a training dataset in which both the predictors and the true response are known, and we use this dataset to build a model that can make predictions for new observations whose response we do not yet know. The difference is simply in the type of response we are trying to predict.
 
-Classification therefore occupies a position within statistical learning that is parallel to regression. If regression answers the question "how much" then classification answers the question "which one" Both regression and classification are forms of supervised learning, meaning that we have a training dataset in which both the predictors and the true response are known, and we use this dataset to build a model that can make predictions for new observations whose response we do not yet know. The difference is simply in the type of response we are trying to predict.
+Imagine that our response variable has two categories, which we code numerically as 0 and 1. For example, within the data on heart disease , we might code "No disease" as 0 and "Disease present" as 1. One might think that we could simply fit a linear regression model with this 0/1 variable as the response, and then use the fitted values as predicted probabilities. If the model predicts a value close to 1 for a given patient, we would classify that patient as having heart disease, and if it predicts a value close to 0, we would classify the patient as healthy. The problem with this approach is that linear regression does not know that the response is a probability. A linear regression model produces fitted values by computing a linear combination of the predictors, and there is nothing in the mathematics of linear regression that constrains these fitted values to fall between 0 and 1. In practice, for some combinations of predictor values, the model will produce predictions that are less than 0 or greater than 1. These values cannot be interpreted as probabilities, and they make no logical sense in the context of classification.
 
-Imagine that our response variable has two categories, which we code numerically as 0 and 1. For example, in our heart disease dataset, we might code "No disease" as 0 and "Disease present" as 1. One might think that we could simply fit a linear regression model with this 0/1 variable as the response, and then use the fitted values as predicted probabilities. If the model predicts a value close to 1 for a given patient, we would classify that patient as having heart disease, and if it predicts a value close to 0, we would classify the patient as healthy. The problem with this approach is that linear regression does not know that the response is a probability. A linear regression model produces fitted values by computing a linear combination of the predictors, and there is nothing in the mathematics of linear regression that constrains these fitted values to fall between 0 and 1. In practice, for some combinations of predictor values, the model will produce predictions that are less than 0 or greater than 1. These values cannot be interpreted as probabilities, and they make no logical sense in the context of classification.
-
-The situation becomes even more problematic when the response variable has more than two categories. Suppose we are predicting a patient's diagnosis and the possible outcomes are "mild condition", "moderate condition", and "severe condition." To use linear regression, we would need to assign numerical codes to these categories - say 1, 2, and 3. But this coding implies that the difference between mild and moderate is the same as the difference between moderate and severe, and it implies a specific ordering. If we had instead used the codes 1, 2, and 4, the model would produce different results, even though the underlying categories have not changed. For a truly nominal variable with no natural ordering - say, three types of chest pain - any numerical coding would impose a structure that simply does not exist in the data. This is a fundamental flaw that cannot be fixed by choosing a clever coding scheme.
+The situation becomes even more problematic when the response variable has more than two categories. Suppose we are predicting a patient's diagnosis and the possible outcomes are "mild condition", "moderate condition", and "severe condition". To use linear regression, we would need to assign numerical codes to these categories - say 1, 2, and 3. But this coding implies that the difference between mild and moderate is the same as the difference between moderate and severe, and it implies a specific ordering. If we had instead used the codes 1, 2, and 4, the model would produce different results, even though the underlying categories have not changed. For a truly nominal variable with no natural ordering - say, three types of chest pain - any numerical coding would impose a structure that simply does not exist in the data. This is a fundamental flaw that cannot be fixed by choosing a clever coding scheme.
 
 Classification methods avoid these problems entirely. Logistic regression, for example, models the probability of belonging to a particular class using a mathematical function - the logistic function - that is guaranteed to produce values between 0 and 1, no matter what values the predictors take. Discriminant analysis methods approach the problem from a different angle by modelling the distribution of the predictors within each class and then computing class probabilities using Bayes' theorem. In both cases, the output of the model is a set of well-defined probabilities that sum to one across the possible classes, and the final classification is made by assigning each observation to the class with the highest estimated probability.
 
-Our bank marketing dataset provides a perfect illustration of a classification problem. We have 4,521 individuals, and for each individual we have recorded 16 predictor variables that capture various aspects of their demographic profile, financial situation, and interactions with the marketing campaign — their age, type of occupation, marital status, highest level of education, whether they have credit in default, their average annual bank balance in euros, whether they hold a housing loan, whether they hold a personal loan, the communication channel used to contact them, the day and month of last contact, the duration of the last phone call in seconds, the number of times they were contacted during the current campaign, the number of days since they were last contacted in a previous campaign, the number of times they were contacted before the current campaign, and the outcome of the previous marketing campaign. The response variable is whether or not the client subscribed to a term deposit, recorded as a binary outcome: "no" for clients who did not subscribe and "yes" for those who did.
+Our bank marketing dataset provides a perfect illustration of a classification problem. We have 4,521 individuals, and for each individual we have recorded 16 predictor variables that capture various aspects of their demographic profile, financial situation, and interactions with the marketing campaign. The response variable is whether or not the client subscribed to a term deposit, recorded as a binary outcome: "no" for clients who did not subscribe and "yes" for those who did. The classification task here is straightforward to state: given the 16 demographic, financial, and campaign-related measurements for a new client, we want to predict whether that client will subscribe to the term deposit or not. But although the question is simple, the methodology must be chosen carefully. We need a method that will estimate the probability that a given client belongs to the "yes" group versus the "no" group, and we need to evaluate how accurately that method performs so that we can trust its predictions in a marketing, business, or social research context.
 
-The classification task here is straightforward to state: given the 16 demographic, financial, and campaign-related measurements for a new client, we want to predict whether that client will subscribe to the term deposit or not. But although the question is simple, the methodology must be chosen carefully. We need a method that will estimate the probability that a given client belongs to the "yes" group versus the "no" group, and we need to evaluate how accurately that method performs so that we can trust its predictions in a marketing, business, or social research context.
+In practice, we would proceed by first splitting the data or using resampling methods to assess how well our chosen classifier generalises to new observations. We would fit the classification model on a training portion of the data, obtain predicted class probabilities for each observation in the test portion, assign each observation to the class with the highest probability, and then evaluate performance using tools such as the confusion matrix and the ROC curve. We might try several different classification methods and compare their performance to determine which one is most appropriate for this particular dataset.
 
-In practice, we would proceed by first splitting the data or using resampling methods to assess how well our chosen classifier generalises to new observations. We would fit the classification model on a training portion of the data, obtain predicted class probabilities for each observation in the test portion, assign each observation to the class with the highest probability, and then evaluate performance using tools such as the confusion matrix and the ROC curve. We might try several different classification methods - logistic regression, linear discriminant analysis, quadratic discriminant analysis, naive Bayes, K-nearest neighbours - and compare their performance to determine which one is most appropriate for this particular dataset.
+There are more classification methods and the field of classification is rich and rapidly evolving. However, the five methods are among the most widely used and foundational techniques in the social sciences, providing a solid starting point for understanding the principles of classification:
 
-There are more classification methods and the field of classification is rich and rapidly evolving. However, the five methods - logistic regression, linear discriminant analysis, quadratic discriminant analysis, naive Bayes, and K-nearest neighbours - are among the most widely used and foundational techniques in the social sciences. They provide a solid starting point for understanding the principles of classification.
+- **Logistic regression** is the most widely used classification method in the social sciences conceptually close to linear regression. It directly models the probability that the response belongs to a particular class by applying the logistic function to a linear combination of the predictors. The result is a model in which the log-odds of belonging to one class versus the other is a linear function of the predictors. The coefficients are estimated using maximum likelihood, and they can be interpreted in terms of how each predictor affects the odds of the outcome.
 
-**Logistic regression** is the most widely used classification method in the social sciences conceptually close to linear regression. It directly models the probability that the response belongs to a particular class by applying the logistic function to a linear combination of the predictors. The result is a model in which the log-odds of belonging to one class versus the other is a linear function of the predictors. The coefficients are estimated using maximum likelihood, and they can be interpreted in terms of how each predictor affects the odds of the outcome.
+- **Linear discriminant analysis** (LDA) takes a different approach. Instead of modelling the probability of class membership directly, it models the distribution of the predictor variables within each class. Specifically, it assumes that the predictors follow a multivariate normal distribution within each class and that all classes share the same covariance matrix. Using Bayes' theorem, it then computes the posterior probability that a new observation belongs to each class. Because of the shared covariance assumption, the decision boundaries between classes are linear. LDA is particularly useful when the classes are well separated and when the normality assumption is approximately met.
 
-**Linear discriminant analysis** (LDA) takes a different approach. Instead of modelling the probability of class membership directly, it models the distribution of the predictor variables within each class. Specifically, it assumes that the predictors follow a multivariate normal distribution within each class and that all classes share the same covariance matrix. Using Bayes' theorem, it then computes the posterior probability that a new observation belongs to each class. Because of the shared covariance assumption, the decision boundaries between classes are linear. LDA is particularly useful when the classes are well separated and when the normality assumption is approximately met.
+- **Quadratic discriminant analysis** (QDA) is a generalisation of LDA that relaxes the shared covariance assumption. Each class is allowed to have its own covariance matrix, which means the decision boundaries between classes can be curved rather than straight. This gives QDA more flexibility to capture complex patterns in the data, but it also requires estimating more parameters, which means it needs more data to perform well and is more prone to overfitting when the sample size is small.
 
-**Quadratic discriminant analysis** (QDA) is a generalisation of LDA that relaxes the shared covariance assumption. Each class is allowed to have its own covariance matrix, which means the decision boundaries between classes can be curved rather than straight. This gives QDA more flexibility to capture complex patterns in the data, but it also requires estimating more parameters, which means it needs more data to perform well and is more prone to overfitting when the sample size is small.
+- **Naive Bayes** is another Bayes' theorem-based method, but it makes a different simplifying assumption: it assumes that the independent variables are independent of each other within each class. This assumption is almost never literally true, but it has the enormous practical advantage of reducing the number of parameters that must be estimated. Instead of estimating a full covariance matrix, naive Bayes estimates only the marginal distribution of each predictor within each class. This makes it very efficient and particularly useful when the number of predictors is large relative to the number of observations.
 
-**Naive Bayes** is another Bayes' theorem-based method, but it makes a different simplifying assumption: it assumes that the independent variables are independent of each other within each class. This assumption is almost never literally true, but it has the enormous practical advantage of reducing the number of parameters that must be estimated. Instead of estimating a full covariance matrix, naive Bayes estimates only the marginal distribution of each predictor within each class. This makes it very efficient and particularly useful when the number of predictors is large relative to the number of observations.
-
-**K-nearest neighbours** (KNN) is a non-parametric method that makes no assumptions about the form of the decision boundary or the distribution of the predictors. To classify a new observation, it simply looks at the K observations in the training data that are most similar to the new observation (in terms of their predictor values) and assigns the new observation to the most common class among those neighbours. The method is intuitive and highly flexible, but its performance depends heavily on the choice of K and on the scale of the predictor variables.
+- **K-nearest neighbours** (KNN) is a non-parametric method that makes no assumptions about the form of the decision boundary or the distribution of the predictors. To classify a new observation, it simply looks at the K observations in the training data that are most similar to the new observation (in terms of their predictor values) and assigns the new observation to the most common class among those neighbours. The method is intuitive and highly flexible, but its performance depends heavily on the choice of K and on the scale of the predictor variables.
 
 While these five methods form the core of the classification, the field of classification is much broader, and it is useful to be aware of some other important approaches. Decision trees classify observations by recursively splitting the predictor space into regions based on simple rules applied to individual predictors. The result is an intuitive tree-like structure where each internal node represents a test on a predictor, each branch represents an outcome of that test, and each leaf represents a class prediction. Decision trees are easy to interpret but can be unstable and prone to overfitting. Random forests and boosting are ensemble methods that improve on single decision trees by combining many trees together. Random forests build a large number of trees on random subsets of the data and predictors, and then aggregate their predictions by majority vote. Boosting builds trees sequentially, with each new tree focusing on the observations that the previous trees misclassified. Both methods are among the most powerful general-purpose classifiers available. Support vector machines (SVMs) construct a decision boundary by finding the hyperplane that maximises the margin between classes. They can be extended to handle non-linear boundaries through the use of kernel functions. SVMs are particularly effective in high-dimensional settings. Neural networks and deep learning are highly flexible models that learn complex, non-linear relationships between predictors and the response through layers of interconnected nodes. They are the foundation of modern machine learning and are particularly powerful for tasks involving images, text, and other unstructured data, but they can also be applied to structured datasets like ours. Each of these methods has its strengths, weaknesses, and assumptions, and part of the skill of statistical learning is knowing which method is appropriate for a given problem.
 
@@ -115,16 +111,16 @@ What makes logistic regression different from linear regression is the way it co
 
 To appreciate why the logistic function is necessary, let us first consider what happens if we naively model the probability of subscription as a linear function of a predictor. Suppose we use only one predictor, the duration of the last phone call. A linear model would look like this: the probability that a client subscribes equals some intercept plus a slope coefficient multiplied by duration. The problem is immediately apparent - for very short calls, this model might predict negative probabilities, and for very long calls, it might predict probabilities greater than one. Neither of these outcomes makes any sense.
 
-The **logistic function** provides an elegant solution. Instead of modelling the probability as a straight line, we model it as a curve that is shaped like an elongated S. The mathematical form of the logistic function is as follows: the probability that the response equals "yes" given a predictor X is equal to the exponential of the linear combination (beta zero plus beta one times X) divided by one plus that same exponential. Written symbolically, this is:
+The **logistic function** provides an elegant solution. Instead of modelling the probability as a straight line, we model it as a curve that is shaped like an elongated S. The mathematical form of the logistic function is as follows: the probability that the response equals "yes" given a predictor $X$ is equal to the exponential of the linear combination divided by one plus that same exponential. Written symbolically, this is:
 
 $$
 p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1X}}
 $$
 
-This function has a very important property: no matter what values the coefficients $\beta_0$ and $\beta_1$ take, and no matter what value X takes, the output of the logistic function is always between 0 and 1. When the linear combination $\beta_0 + \beta_1X$ is a very large positive number, the exponential dominates and the function approaches 1. When the linear combination is a very large negative number, the exponential approaches 0 and the function approaches 0. When the linear combination equals 0, the function returns exactly 0.5. This S-shaped curve therefore provides a natural and mathematically well-behaved way to model probabilities.
+This function has a very important property: no matter what values the coefficients $\beta_0$ and $\beta_1$ take, and no matter what value $X$ takes, the output of the logistic function is always between 0 and 1. When the linear combination $\beta_0 + \beta_1X$ is a very large positive number, the exponential dominates and the function approaches 1. When the linear combination is a very large negative number, the exponential approaches 0 and the function approaches 0. When the linear combination equals 0, the function returns exactly 0.5. This S-shaped curve therefore provides a natural and mathematically well-behaved way to model probabilities.
 
 To understand the coefficients of a logistic regression model, we need to introduce two related concepts: the odds and the log-odds.
-The **odds of an event** are defined as the probability that the event occurs divided by the probability that it does not occur. If the probability that a client subscribes is p, then the odds of subscription are $p / (1 - p)$. Odds are a familiar concept in everyday language - when we say that the odds of something are 3 to 1, we mean that the event is three times more likely to happen than not to happen. Unlike probabilities, which are bounded between 0 and 1, odds can range from 0 to positive infinity. An odds of 1 means the event is equally likely to occur or not occur; an odds greater than 1 means the event is more likely than not; and an odds less than 1 means the event is less likely than not.
+The **odds of an event** are defined as the probability that the event occurs divided by the probability that it does not occur. If the probability that a client subscribes is $p$, then the odds of subscription are $p / (1 - p)$. Odds are a familiar concept in everyday language - when we say that the odds of something are 3 to 1, we mean that the event is three times more likely to happen than not to happen. Unlike probabilities, which are bounded between 0 and 1, odds can range from 0 to positive infinity. An odds of 1 means the event is equally likely to occur or not occur; an odds greater than 1 means the event is more likely than not; and an odds less than 1 means the event is less likely than not.
 
 Now, if we take the logistic model and rearrange it algebraically, we can show that the odds are equal to the exponential of the linear combination:
 
@@ -135,29 +131,51 @@ $$
 If we then take the natural logarithm of both sides, we get:
 
 $$
-log(\frac{p(X)}{1 − p(X)}) = \beta_0 + \beta_1X
+\log\left(\frac{p(X)}{1 − p(X)}\right) = \beta_0 + \beta_1X
 $$
 
-The left-hand side of this equation - the logarithm of the odds - is called the log-odds or, equivalently, the **logit**. This is an extremely important result because it tells us that in a logistic regression model, the log-odds of the response is a linear function of the predictors. This is why the method is called logistic regression: the logit is linear in the predictors, just as the response itself is linear in the predictors in ordinary linear regression.
+The left-hand side of this equation - the logarithm of the odds - is called the **log-odds** or, equivalently, the logit. This is an extremely important result because it tells us that in a logistic regression model, the log-odds of the response is a linear function of the predictors. This is why the method is called logistic regression: the logit is linear in the predictors, just as the response itself is linear in the predictors in ordinary linear regression.
 
-The practical interpretation of the slope coefficient $\beta_1$ is as follows: a one-unit increase in the predictor X is associated with a change of $\beta_1$ in the log-odds of the response. Equivalently, a one-unit increase in X multiplies the odds by a factor of $e^\beta_1$. This multiplicative interpretation of the coefficients in terms of odds ratios is central to how logistic regression results are reported and interpreted in the social sciences.
+The practical interpretation of the slope coefficient $\beta_1$ is as follows: a one-unit increase in the predictor $X$ is associated with a change of $\beta_1$ in the log-odds of the response. Equivalently, a one-unit increase in $X$ multiplies the odds by a factor of $e^\beta_1$. This multiplicative interpretation of the coefficients in terms of odds ratios is central to how logistic regression results are reported and interpreted in the social sciences.
 
 It is important to note that although the logit is linear in the predictors, the probability itself is not. The relationship between a predictor and the probability of the outcome is always non-linear and S-shaped. This means that the effect of a one-unit increase in a predictor on the probability depends on the current value of that predictor. Near the extremes of the probability scale (close to 0 or close to 1), changes in the predictor have relatively little effect on the probability, while near the middle of the scale (around 0.5), the same change in the predictor has a much larger effect.
 
 Let us now fit a simple logistic regression model using the `bank_dataset`, predicting subscription to a term deposit based solely on the duration of the last phone call. In R, logistic regression is fitted using the `glm()` function with the argument `family = binomial`.
 
 ::: {.callout-tip icon="false" collapse="true" title="Example: Simple Logistic Regression"}
-The glm() function stands for generalised linear model, and by specifying `family = binomial`, we tell R that we want to fit a logistic regression. The formula `y ~ duration` specifies that we are modelling the response variable `y` as a function of the single predictor `duration`. When you run this code and call `summary()`, R will display the estimated coefficients, their standard errors, z-values, and p-values.
+The `glm()` function stands for generalised linear model, and by specifying `family = binomial`, we tell R that we want to fit a logistic regression. The formula `y ~ duration` specifies that we are modelling the response variable `y` as a function of the single predictor `duration`. When you run this code and call `summary()`, R will display the estimated coefficients, their standard errors, z-values, and p-values.
 
 ```{r}
 logistic_simple <- glm(
   y ~ duration,
-  data = bank_dataset,
+  data = bank_marketing_dataset,
   family = binomial
 )
 
 summary(logistic_simple)
 ```
+
+The most important part of the output is the coefficients table, which contains the estimated parameters of the logistic regression model.
+
+The intercept is estimated as -3.193. In a logistic regression, the intercept represents the estimated log-odds of the response being "yes" when all predictors are equal to zero. In our case, this means the estimated log-odds of a client subscribing to a term deposit when the duration of the last phone call is zero seconds. A log-odds of -3.193 is a very large negative number, which tells us that when the call duration is zero, the model estimates an extremely low probability of subscription. We can convert this log-odds to a probability using the logistic function: $p = \frac{e^{-3.193}}{1 + e^{-3.193}}$, which equals approximately 0.039, or about 3.9%. This makes intuitive sense - if the bank did not speak with the client at all, we would expect almost no chance of subscription.
+
+The coefficient for duration is estimated as 0.003529. This tells us that for each additional second of call duration, the log-odds of subscribing to the term deposit increase by 0.003529. While this number may seem very small, remember that duration is measured in seconds, and phone calls typically last hundreds of seconds. Over the course of a call that lasts several minutes, the cumulative effect on the log-odds becomes substantial. To interpret this coefficient in terms of odds rather than log-odds, we exponentiate it: $e^{0.003529} \approx 1.00353$. This means that each additional second of call duration multiplies the odds of subscription by a factor of approximately 1.0035, which is a 0.35% increase in the odds per second. If we think in terms of minutes rather than seconds, a one-minute increase (60 seconds) multiplies the odds by $e^{0.003529 × 60} \approx e^{0.2117} \approx 1.236$, which represents a roughly 23.6% increase in the odds of subscription for each additional minute of conversation. This is a meaningful and practically significant effect - longer conversations with clients are associated with substantially higher odds of them subscribing to the term deposit.
+
+The standard error for the intercept is 0.02613 and for duration it is 0.00005482. Standard errors measure the uncertainty in the coefficient estimates. Smaller standard errors indicate more precise estimates. In our case, both standard errors are very small relative to the coefficient estimates, which reflects the fact that we have a large dataset (45,211 observations) and therefore a great deal of information for estimating the parameters.
+
+The z-value is computed by dividing each estimated coefficient by its standard error. For the intercept, $z = -3.193 / 0.02613 = -122.19$. For duration, $z = 0.003529 / 0.00005482 = 64.38$. The z-value plays the same role in logistic regression that the t-statistic plays in linear regression - it measures how many standard errors the estimated coefficient is from zero. Large absolute z-values indicate strong evidence that the true coefficient is not zero.
+
+The p-value for each coefficient tests the null hypothesis that the true coefficient equals zero, meaning that the predictor has no effect on the log-odds of the response. Both p-values in our output are reported as less than $2 \times 10^{-16}$. This means that the evidence against the null hypothesis is overwhelming - both the intercept and the duration coefficient are extremely statistically significant. The three asterisks next to each p-value confirm this, as they indicate significance at the 0.001 level, which is the most stringent threshold shown in the significance codes. For the duration predictor specifically, the tiny p-value tells us that there is an extremely strong statistical association between the length of the phone call and the probability of subscribing to the term deposit. This should not be surprising - a longer conversation gives the bank representative more time to explain the product, answer questions, and persuade the client.
+
+Below the coefficients table, R reports two measures of model fit called deviances.
+
+The null deviance measures how well the response variable is predicted by a model that includes only the intercept and no predictors. It is analogous to the total sum of squares in linear regression. The degrees of freedom for the null deviance equal the number of observations minus one (45,211 - 1 = 45,210). The null deviance represents the worst-case baseline - it tells us how poorly we predict if we ignore all predictor information and simply estimate the overall probability of subscription.
+
+The residual deviance measures how well the response is predicted by the model that includes the predictor duration. The degrees of freedom are reduced by one (because we have estimated one additional parameter beyond the intercept), giving 45,209. The residual deviance is substantially lower than the null deviance, which tells us that adding duration to the model meaningfully improves the fit. The reduction in deviance from 32,631 to 27,502 - a drop of 5,129 - represents the improvement in explanatory power gained by including call duration as a predictor. This difference approximately follows a chi-squared distribution with one degree of freedom under the null hypothesis that duration has no effect, and a drop of 5,129 is extraordinarily large, confirming what the p-value already told us.
+
+The AIC, or Akaike Information Criterion, is a measure of model quality that balances goodness of fit against model complexity. It is calculated as the residual deviance plus twice the number of estimated parameters. In our case, we estimated two parameters (the intercept and the duration coefficient), so $AIC = 27,502 + 2 \times 2 = 27,506$. The AIC is not interpretable in absolute terms - it only becomes useful when comparing two or more models fitted to the same data. A lower AIC indicates a better model, taking into account both how well the model fits and how many parameters it uses. We will use the AIC later when comparing the simple model to the multiple logistic regression model.
+
+Number of fisher scoring iterations tells us that the iterative algorithm used to maximise the likelihood function converged in 5 iterations. Fisher scoring is the numerical optimisation method that R uses internally to find the maximum likelihood estimates of the logistic regression coefficients. The fact that convergence occurred in only 5 iterations tells us that the estimation process was straightforward and that there were no numerical difficulties. If this number were very large or if R reported that the algorithm did not converge, it would be a sign of potential problems with the model, such as perfect separation of the classes.
 :::
 
 In linear regression, the coefficients are estimated by the method of least squares, which finds the values of the coefficients that minimise the sum of squared differences between the observed and predicted values. In logistic regression, a different estimation method is used: **maximum likelihood estimation**. The intuition behind maximum likelihood is elegant. We want to find the values of the coefficients $\beta_0$ and $\beta_1$ that make the observed data as probable as possible. For each observation in our dataset, the model gives us a predicted probability that the client subscribes. For clients who actually did subscribe, we want this predicted probability to be high. For clients who did not subscribe, we want this predicted probability to be low (or equivalently, we want the predicted probability of not subscribing to be high). The likelihood function captures this idea formally: it is the product of the predicted probabilities for all the observations, where for each observation we use the predicted probability of the outcome that actually occurred.
@@ -183,7 +201,7 @@ This code produces the estimated probability of subscribing to the term deposit 
 ```{r}
 predicted_class <- ifelse(predicted_probabilities > 0.5, "yes", "no")
 
-table(Predicted = predicted_class, Actual = bank_dataset$y)
+table(Predicted = predicted_class, Actual = bank_marketing_dataset$y)
 ```
 
 This produces a confusion matrix, which is a cross-tabulation of the predicted class labels against the actual class labels. The confusion matrix tells us how many clients were correctly classified and how many were misclassified. We will explore the confusion matrix and related performance metrics in more detail later, but for now it is important to understand that this is the basic workflow of logistic regression: fit the model, extract predicted probabilities, apply a threshold, and evaluate the results.
@@ -215,7 +233,7 @@ In this model, we are predicting subscription using a rich set of demographic, f
 ```{r}
 logistic_multiple <- glm(
   y ~ age + job + marital + education + balance + housing + loan + contact + duration + campaign + poutcome,
-  data = bank_dataset,
+  data = bank_marketing_dataset,
   family = binomial
 )
 
@@ -229,7 +247,7 @@ predicted_probs_multiple <- predict(logistic_multiple, type = "response")
 
 predicted_class_multiple <- ifelse(predicted_probs_multiple > 0.5, "yes", "no")
 
-table(Predicted = predicted_class_multiple, Actual = bank_dataset$y)
+table(Predicted = predicted_class_multiple, Actual = bank_marketing_dataset$y)
 ```
 :::
 
@@ -265,7 +283,7 @@ library(nnet)
 
 multinomial_model <- multinom(
   y ~ age + duration + balance + education,
-  data = bank_dataset
+  data = bank_marketing_dataset
 )
 
 summary(multinomial_model)
@@ -284,7 +302,7 @@ And to obtain predicted class labels:
 ```{r}
 predicted_class_multinomial <- predict(multinomial_model, type = "class")
 
-table(Predicted = predicted_class_multinomial, Actual = bank_dataset$y)
+table(Predicted = predicted_class_multinomial, Actual = bank_marketing_dataset$y)
 ```
 :::
 
