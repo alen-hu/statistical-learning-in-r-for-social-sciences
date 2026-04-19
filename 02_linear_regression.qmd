@@ -444,6 +444,55 @@ In our multiple regression model, the f-statistic is 1,638 with 6 and 6,600 degr
 It is worth pausing to note an interesting detail. Even though `sleep_hours` was not individually significant (p = 0.384), the overall f-test is still overwhelmingly significant. This is entirely consistent: the f-test only requires that at least one predictor be related to the response, and the other five predictors more than satisfy this requirement. The f-test does not tell us which predictors are significant - that is the job of the individual t-tests. But it does tell us that the model as a whole is capturing real patterns.
 :::
 
+## Prediction in Linear Regression
+
+One of the most practical purposes of linear regression is prediction - using the estimated model to forecast the value of the response variable for new observations based on their predictor values. Once we have estimated the regression coefficients using the least squares method, the model becomes a concrete equation that we can use as a prediction machine. We simply plug in the predictor values for a new observation, and the equation returns a predicted value of the response.
+
+The equation we have used in our simple model allows us to predict the exam score for any student, given the number of hours they study per week. If a student studies 25 hours per week, we would predict their exam score as $61.457 + 0.289 \times 25 = 61.457 + 7.225 = 68.682$. If another student studies 10 hours per week, the predicted score would be $61.457 + 0.289 \times 10 = 61.457 + 2.890 = 64.347$.
+
+When we make a prediction using a regression model, there are two distinct sources of uncertainty, and understanding the difference between them is essential. The first source of uncertainty relates to the estimation of the regression coefficients themselves. Our estimated coefficients $\hat{\beta}_0$ and $\hat{\beta}_1$ are based on a particular sample of students. If we had drawn a different sample, we would have obtained slightly different coefficient estimates, and therefore slightly different predictions. This uncertainty is captured by what is called the confidence interval for the mean response. It tells us what is the plausible range for the average exam score of that entire group. The confidence interval is relatively narrow because it pertains to an average, and averages are estimated more precisely than individual values. The second source of uncertainty goes beyond the coefficients. Even if we knew the true regression coefficients perfectly, we still could not predict any individual student's exam score exactly, because each student is affected by the irreducible error term $\epsilon$ - all the unmeasured factors like test-day anxiety, specific questions on the exam, luck, and so forth. This additional source of uncertainty is captured by what is called the prediction interval for an individual response. It answers a different question: for one specific student who studies a given number of hours, what is the plausible range for that particular student's exam score? The prediction interval is always wider than the confidence interval, because it must account for both the uncertainty in the coefficient estimates and the inherent variability of individual outcomes around the regression line. To illustrate the distinction concretely, if we want to know the average exam score of all students who study 25 hours per week, we use the confidence interval, and this interval will be relatively tight, because we can estimate a group average quite precisely with 6607 observations. But if a specific student comes to us and says "I study 25 hours per week, what will my exam score be?", we use the prediction interval - and this interval will be much wider, because this student is one individual subject to all the random factors that the model cannot capture.
+
+R provides the `predict()` function to generate predictions from a fitted regression model. This function is flexible and can produce both confidence intervals and prediction intervals. Its basic syntax is: `predict(model, newdata, interval = "type", level = 0.95)`. The argument model is the fitted regression object (in our case, simple_model). The argument newdata is a data frame containing the predictor values for which we want predictions - the column names must match the predictor names used in the model. The argument interval specifies whether we want a confidence interval ("confidence") or a prediction interval ("prediction"). And level specifies the confidence level, with 0.95 (95%) being the default.
+
+::: {.callout-tip icon="false" collapse="true" title="Example: Prediction in Linear Regression"}
+In order to generate predictions for new students based on our simple regression model, we first need to create a data frame that contains the `hours_studied` values for which we want to make predictions. Then we can use the `predict()` function to obtain both the predicted exam scores and the associated confidence and prediction intervals. Finally, we have to combine all of this information into a single data frame for easy interpretation.
+
+```{r}
+# Creating a data frame with the hours_studied values we want to predict for
+new_students <- data.frame(hours_studied = c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50))
+
+# Generating predictions for the new students
+predictions <- predict(simple_model, newdata = new_students)
+
+# Calculating confidence intervals for the mean response
+conf_intervals <- predict(simple_model, newdata = new_students, interval = "confidence", level = 0.95)
+
+# Calculating prediction intervals for an individual response
+pred_intervals <- predict(simple_model, newdata = new_students, interval = "prediction", level = 0.95)
+
+# Combining everything into one data frame
+results <- data.frame(
+    hours_studied = new_students$hours_studied,
+    predicted_score = predictions,
+    conf_low = conf_intervals[, "lwr"],
+    conf_high = conf_intervals[, "upr"],
+    pred_low = pred_intervals[, "lwr"],
+    pred_high = pred_intervals[, "upr"]
+)
+
+# Printing the results
+results
+```
+
+The `predicted_score` column shows the point predictions from our regression equation $exam_score = 61.457 + 0.289 \times hours_studied$. The predictions follow a perfectly linear pattern, increasing by exactly 1.446 points for every 5 additional hours of study (since $0.289 \times 5 = 1.446$). A student who studies 5 hours is predicted to score 62.90, while a student who studies 50 hours is predicted to score 75.92 - a difference of about 13 points across the full range.
+
+The Confidence Intervals (`conf_low` and `conf_high`) tell us the range within which the true average exam score for all students at a given study level is likely to fall. For a student studying 20 hours per week (close to the sample mean of 19.98), the confidence interval is very narrow - [67.159, 67.327], a width of only 0.17 points. This extreme precision reflects the fact that we have a very large sample of 6,607 observations, and predictions near the mean of the predictor are always the most precise. Notice how the confidence intervals become wider as we move away from the mean in either direction. At 5 hours, the width is 0.45 points and at 50 hours, the width is 0.86 points. This widening occurs because we have fewer observations at the extreme values of study hours, and because predictions far from the mean rely more heavily on the estimated slope, whose uncertainty gets amplified over longer distances from the center of the data. This is a fundamental property of linear regression - we are most confident about predictions near the middle of the data and least confident about predictions at the edges.
+
+The Prediction Intervals (`pred_low` and `pred_high`) tell us the range within which any single individual student's exam score is likely to fall. They are dramatically wider than the confidence intervals. For a student studying 20 hours, the prediction interval is [60.414, 74.072], a width of about 13.66 points. Compare this to the confidence interval width of 0.17 points at the same study level - the prediction interval is roughly 80 times wider. This enormous difference captures the fundamental distinction between predicting a group average and predicting an individual outcome. We can estimate the average score of all 20-hour-per-week students very precisely, but any particular student who studies 20 hours might score anywhere from about 60 to 74, because individual outcomes are subject to all the unmeasured factors captured by the error term - motivation, test anxiety, the specific questions on the exam, prior knowledge, and countless other influences.
+
+The width of the prediction intervals also illustrates the limitations of our simple model. With an $R^2$ of only 0.198, the model leaves 80% of the variance unexplained, and this unexplained variance translates directly into wide prediction intervals. A prediction interval of roughly 13 to 14 points on an exam where scores range from 55 to 101 means that our model, while correctly identifying the direction and significance of the relationship, is not very useful for predicting what any specific student will score.
+:::
+
 ## Interaction Terms
 
 Up to this point, all the linear regression models we have discussed have assumed something that may seem natural but is in fact a very strong assumption: that the effect of each predictor on the response is independent of the values of the other predictors. This is called the **additivity assumption**, and it is built into the standard multiple linear regression model. By this, we are implicitly saying that the effect of studying one additional hour is always the same - roughly 0.29 additional points - regardless of whether a student has 60% attendance or 100% attendance. Similarly, we are saying that the effect of one additional percentage point of attendance is always the same, regardless of how many hours the student studies. The model treats each predictor's contribution as completely separate and simply adds them together.
